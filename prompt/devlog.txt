@@ -1,0 +1,704 @@
+# Planty Application Development Log
+
+## Phase: Initial Setup & Configuration
+
+### Stripe CLI Configuration (Local Development)
+- **Purpose**: To test Stripe webhooks locally.
+- **Command**: `stripe listen --forward-to localhost:3000/api/webhook/stripe --skip-verify`
+- **Frequency**: Run this command in a separate terminal for each local development session where webhook testing is needed.
+- **Webhook Secret**:
+    - The `stripe listen` command provides a temporary webhook signing secret (e.g., `whsec_...`).
+    - This temporary secret MUST be used for the `STRIPE_WEBHOOK_SECRET` environment variable in the local development environment (e.g., in `.env.local`) for the duration of the listening session.
+    - The permanent webhook secret from the Stripe Dashboard is used for deployed environments.
+- **Key Files/Variables**:
+    - `.env.local` (for temporary local `STRIPE_WEBHOOK_SECRET`)
+    - Assumed webhook handler path: `app/api/webhook/stripe/route.ts` (or similar based on Next.js App Router conventions)
+
+---
+
+## Phase: Feature Implementation
+
+### Feature: Overall Layout & Core UI Implementation
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Task File**: `prompt/Overall Layout & Core UI Implementation.md`
+- **Summary**:
+    - Established the basic visual structure and navigation for the Planty application.
+    - Updated the main application header with Planty branding, primary colors, and core navigation links (Chat, Listings, Cart).
+    - Refined the main application page (`app/app/page.tsx`) to serve as a welcoming content area.
+    - Configured Next.js image optimization for `picsum.photos`.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router)
+    - React
+    - TypeScript
+    - Tailwind CSS
+    - Shadcn/UI (specifically `Button` component)
+    - Lucide React (for icons like Menu, X)
+- **Files Modified**:
+    1.  `components/app/Header.tsx`:
+        - Changed background to `bg-primary` and text to `text-primary-foreground`.
+        - Updated app title to "Planty".
+        - Added desktop navigation links: "Chat", "Listings", "Cart" using `Button` component with `variant="link"`.
+        - Adapted mobile menu to include the new navigation links.
+        - Implemented `handleNavClick` function for logging navigation and closing mobile menu.
+    2.  `app/app/page.tsx`:
+        - Added `"use client";` directive.
+        - Implemented `useEffect` for a console log on component mount.
+        - Updated main content area with a welcome message and placeholder text within a styled container.
+    3.  `next.config.ts`:
+        - Migrated from `images.domains` to `images.remotePatterns`.
+        - Added `picsum.photos` to `remotePatterns` to allow image optimization from this source.
+        - Kept existing `lh3.googleusercontent.com` pattern.
+    4. `components.json`:
+        - Created/updated by `npx shadcn@latest add button` command.
+        - Configuration: Style: New York, Base Color: Zinc.
+- **Key Decisions & Configurations**:
+    - Followed styling guidelines from the task file (e.g., `bg-primary`, `text-primary-foreground`).
+    - Added Shadcn/UI `button` component using `npx shadcn@latest add button --yes`.
+    - Ensured responsive design for the header.
+    - Added `console.log` statements for debugging navigation and page load as per task instructions.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add button --yes` (initially `npx shadcn-ui@latest add button --yes`, then corrected)
+
+---
+
+### Feature: Seller Listing & Publishing Flow (Steps 1 & 2: Photo Upload and Details Edit)
+- **Date**: 2024-07-25 
+- **Task File**: `prompt/Seller Listing & Publishing Flow.md` (Steps 1 & 2)
+- **PRD Reference**: Section 1: "AI-Powered Plant Listings (For Sellers)" in `prompt/PRD.txt`
+- **Summary**:
+    - Implemented the initial stages of the seller plant listing flow.
+    - Created a multi-step process managed by `app/app/seller/upload/page.tsx`.
+    - **Step 1 (Upload)**: Developed `components/app/PhotoUpload.tsx` for image selection, preview, simulated AI analysis (with progress bar and mock results), and editing of AI suggestions.
+    - **Step 2 (Edit)**: Created `components/app/ListingWizard.tsx` to further edit listing details received from the photo upload step.
+    - The `SellerUploadPage` now handles state management for listing data and current step, transitioning between `PhotoUpload` and `ListingWizard`.
+    - Added placeholder UI for "Preview" and "Publish" steps.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router)
+    - React (useState, functional components)
+    - TypeScript
+    - Tailwind CSS
+    - Shadcn/UI (`Input`, `Button`, `Card`, `Progress`, `Label`)
+    - Lucide React (`Loader2` for spinner)
+- **Files Created**:
+    1.  `components/app/PhotoUpload.tsx`
+    2.  `components/app/ListingWizard.tsx`
+- **Files Modified**:
+    1.  `app/app/seller/upload/page.tsx`:
+        - Implemented state management for wizard steps (`upload`, `edit`, `preview`, `publish`) and `listingData`.
+        - Conditionally renders `PhotoUpload` or `ListingWizard` based on the current step.
+        - Added `onAnalysisComplete` callback to `PhotoUpload` and `onSave`, `onBack` callbacks to `ListingWizard`.
+        - Included a `Progress` bar from Shadcn/UI to show wizard progress.
+        - Defined shared types `AiResults` and `ListingData`.
+    2.  `components/app/PhotoUpload.tsx`: 
+        - Added `onAnalysisComplete` prop to communicate results and image data to parent.
+        - Imported shared types from `SellerUploadPage`.
+        - Form submission now triggers `onAnalysisComplete`.
+    3.  `components/app/ListingWizard.tsx`:
+        - Accepts `initialData`, `onSave`, and `onBack` props.
+        - Form submission triggers `onSave`.
+- **Key Decisions & Configurations**:
+    - Used a parent component (`SellerUploadPage`) to manage the multi-step form state and logic.
+    - Simulated AI processing with `setTimeout` and mock data for iterative development.
+    - Ensured components use Shadcn/UI elements and Tailwind CSS for styling.
+    - Added `console.log` statements for debugging data flow between components and steps.
+    - Confirmed `next.config.ts` already included `picsum.photos` in `remotePatterns`.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add input button card progress label` (some components might have been skipped if already present)
+
+### UI Fixes (Seller Listing Flow - Steps 1 & 3)
+- **Date**: 2024-07-25
+- **Issue**: Buttons ("Analyze Plant", "Confirm & Publish") were nearly transparent/invisible despite being functional.
+- **Fix**:
+    - Explicitly set `variant="default"` on the affected `Button` components in `components/app/PhotoUpload.tsx` (for "Analyze Plant") and `app/app/seller/upload/page.tsx` (for "Confirm & Publish" in the preview placeholder).
+- **Files Modified**:
+    1. `components/app/PhotoUpload.tsx`
+    2. `app/app/seller/upload/page.tsx`
+
+### Feature: Seller Listing & Publishing Flow (Steps 3 & 4: Preview and Publish)
+- **Date**: 2024-07-26
+- **Task File**: `prompt/Seller Listing & Publishing Flow.md` (Steps 3 & 4)
+- **PRD Reference**: Section 1: "AI-Powered Plant Listings (For Sellers)" in `prompt/PRD.txt`
+- **Summary**:
+    - Implemented the final stages of the seller plant listing flow: Preview and Publish.
+    - **Step 3 (Preview)**: Developed `components/app/ListingPreview.tsx` to display all listing details (image, species, care needs, price, description, tags) in a `Card` format, allowing the seller to review before publishing. It includes "Back to Edit" and "Confirm & Publish" actions.
+    - **Step 4 (Publish)**: Integrated Supabase to save the listing to the `listing` table in the database. This involved:
+        - Modifying `utils/supabase/client.ts` to accept `supabaseAccessToken` as a parameter, resolving a client-side bundling issue with `nodemailer`.
+        - Updating `app/app/seller/upload/page.tsx` to manage publishing state (`isPublishing`, `publishError`), call the Supabase client with the access token, and map `listingData` to the `listing` table schema.
+        - Regenerating Supabase TypeScript types (`types/database.types.ts`) to ensure schema accuracy after initial difficulties with CLI prompts.
+        - Troubleshooting an empty Supabase insert error by identifying and removing an extraneous `description` field from the insert payload that was not present in the table schema.
+    - The `SellerUploadPage` now handles the complete flow from photo upload to successful database insertion, including UI feedback for publishing progress, success, and errors.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router, `useRouter`)
+    - React (`useState`)
+    - TypeScript
+    - Supabase (`@supabase/supabase-js` client)
+    - NextAuth.js (`useSession` for `supabaseAccessToken`)
+    - Shadcn/UI (`Card`, `Separator`, `Badge` - added `separator` and `badge`)
+    - Tailwind CSS
+- **Files Created**:
+    1.  `components/app/ListingPreview.tsx`
+- **Files Modified**:
+    1.  `app/app/seller/upload/page.tsx`:
+        - Integrated `ListingPreview` component.
+        - Added `handleConfirmAndPublish` async function for Supabase insert logic.
+        - Implemented state management for publishing status and errors.
+        - Passed `supabaseAccessToken` to `createSupabaseClient`.
+        - Refined UI for the publish step to show different states (publishing, success, error).
+        - Corrected the data mapping to Supabase `listing` table (removed `description`).
+    2.  `utils/supabase/client.ts`:
+        - Modified `createSupabaseClient` to accept `supabaseAccessToken` as an argument to prevent server-side modules from being bundled on the client.
+    3.  `types/database.types.ts`:
+        - Regenerated to include accurate Supabase table type definitions after several attempts to resolve CLI output issues.
+    4.  `components.json` (implicitly by `shadcn@latest add separator badge`)
+- **Key Decisions & Configurations**:
+    - Used a temporary file (`temp_db_types.ts`) strategy to reliably capture Supabase type generation output.
+    - Resolved client-side "Module not found" errors by ensuring server-only code was not imported into client components.
+    - Ensured the data structure sent to Supabase matched the `listing` table schema exactly.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add separator badge --yes`
+    - `npx supabase gen types typescript --project-id oaxkitlcltcmxwketlvz --schema public > types/database.types.ts` (and variations during troubleshooting)
+    - `npx supabase login`
+    - `npx supabase init` (confirmed already initialized)
+
+### Feature: Implement Dynamic Filters & Product Discovery Enhancements
+- **Date**: 2024-07-27
+- **Task File**: `prompt/Implement Dynamic Filters & Product Discovery Enhancements.md`
+- **PRD Reference**: Section 2: "Dynamic Filters & Product Discovery (For Buyers)" in `prompt/PRD.txt` (assumed section, verify PRD)
+- **Summary**:
+    - Implemented a dynamic product filtering system on a new listings page (`/app/listings`).
+    - Created a `FiltersPanel` component with controls for light level, size, and watering frequency.
+    - Integrated the `FiltersPanel` into the listings page using a collapsible `Sheet` component for user interface.
+    - Listings are fetched from the Supabase `listing` table.
+    - User filter preferences are persisted in the `search_preference` table and loaded on subsequent visits.
+    - Modified the `listing` database table to include `light_level`, `size`, and `watering_frequency` columns.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router, `useSession`)
+    - React (`useState`, `useEffect`, `useCallback`)
+    - TypeScript
+    - Supabase (`@supabase/supabase-js` client)
+    - NextAuth.js (`useSession` for `supabaseAccessToken`)
+    - Shadcn/UI (`Checkbox`, `Slider`, `Select`, `Label`, `Button`, `Card`, `Sheet`)
+    - Lucide React (`SlidersHorizontal` icon)
+- **Files Created**:
+    1.  `types/index.ts`: Added `Filters` and `Product` interfaces.
+    2.  `components/app/FiltersPanel.tsx`: Component for filter UI and logic.
+    3.  `app/app/listings/page.tsx`: Page to display listings and integrate filters.
+    4.  `utils/supabase/user.ts`: Functions `saveUserPreferences` and `fetchUserPreferences`.
+- **Files Modified**:
+    1.  `prompt/0-supabase-sql.md`: Updated `listing` table definition to include new filterable columns.
+    2.  `types/database.types.ts`: Regenerated to reflect schema changes.
+    3.  `types/next-auth.d.ts`: Verified `Session` augmentation (though primary changes were to ensure its usage).
+    4.  `components.json` (implicitly by `shadcn@latest add checkbox slider select label sheet`)
+- **Key Decisions & Configurations**:
+    - Added `light_level`, `size`, `watering_frequency` columns to the `listing` table for effective filtering.
+    - Implemented client-side filtering logic with real-time updates.
+    - User preferences are fetched on page load and saved when filters are changed.
+    - Used a `Sheet` component for the filter panel, triggered by a button.
+    - Addressed type mismatches between `next-auth` session types by explicit import and type assertion.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add checkbox slider select label sheet --yes`
+    - `npm install lucide-react`
+    - `npx supabase gen types typescript --project-id oaxkitlcltcmxwketlvz --schema public > types/database.types.ts`
+
+- **Troubleshooting (2024-07-27/28)**:
+    - Resolved a persistent "Cannot update a component (`ListingsPage`) while rendering a different component (`FiltersPanel`)" error.
+    - The fix involved deferring state updates (`setCurrentFilters`, `setFilteredProducts`) in `app/app/listings/page.tsx` using `setTimeout(0, ...)` to break synchronous update cycles between `ListingsPage` and `FiltersPanel`.
+    - Addressed underlying module resolution and linter errors by performing a clean reinstall of `node_modules` and `pnpm-lock.yaml`, and ensuring Prettier versions were consistent using pnpm overrides.
+
+--- 
+
+### Feature: Refine Seller Listing Flow for Filterable Attributes
+- **Date**: 2024-07-29
+- **Task File**: Related to `prompt/Implement Dynamic Filters & Product Discovery Enhancements.md` (ensuring data for filters)
+- **PRD Reference**: Section 1: "AI-Powered Plant Listings (For Sellers)" & Section 2: "Dynamic Filters & Product Discovery (For Buyers)" in `prompt/PRD.txt`
+- **Summary**:
+    - Updated the seller listing creation process to include inputs for `light_level`, `size`, and `watering_frequency`.
+    - This allows new listings to be populated with data necessary for the dynamic filtering system on the listings page.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router)
+    - React (`useState`)
+    - TypeScript
+    - Shadcn/UI (`Select`)
+- **Files Modified**:
+    1.  `app/app/seller/upload/page.tsx`:
+        - Added `light_level`, `size`, `watering_frequency` to the `ListingData` interface.
+        - Updated `handleConfirmAndPublish` to include these new fields in the Supabase insert payload, ensuring they are only added if they have values.
+    2.  `components/app/ListingWizard.tsx`:
+        - Added `Select` components (from Shadcn/UI) to the form for "Light Level", "Size", and "Watering Frequency".
+        - Implemented `handleSelectChange` to update form state for these new dropdowns.
+        - Ensured the new fields are passed in the `onSave` callback.
+- **Key Decisions & Configurations**:
+    - Used common placeholder options for the select dropdowns (e.g., "Low", "Medium", "High" for light level).
+    - Ensured that the Supabase insert logic conditionally includes the new fields to prevent errors if they are not set (though the form design encourages their selection).
+- **CLI Commands Used**:
+    - (Implicitly) `npx shadcn@latest add select` (if not already present, though it was part of previous filter feature)
+
+--- 
+
+### Feature: Product Detail View
+- **Date**: 2024-07-29
+- **Task File**: Based on PRD.txt and general e-commerce flow.
+- **PRD Reference**: Section 2: "Dynamic Filters & Product Discovery (For Buyers)" (implicitly, as viewing details is part of discovery)
+- **Summary**:
+    - Implemented a product detail page accessible via a dynamic route (`/app/listings/[listingId]`).
+    - The page fetches and displays comprehensive details for a single listing from Supabase, including image, species, price, care instructions, tags, and the newly added filterable attributes (light level, size, watering frequency).
+    - Updated the product cards on the main listings page (`/app/listings`) to link their "View Details" button to the corresponding dynamic detail page.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router, `useParams`, `Link`)
+    - React (`useState`, `useEffect`)
+    - TypeScript
+    - Supabase (`@supabase/supabase-js` client)
+    - NextAuth.js (`useSession`)
+    - Shadcn/UI (`Card`, `Badge`, `Separator`, `Button`)
+    - Lucide React (`ArrowLeft` icon)
+- **Files Created**:
+    1. `app/app/listings/[listingId]/page.tsx`
+- **Files Modified**:
+    1. `app/app/listings/page.tsx`:
+        - Imported `Link` from `next/link`.
+        - Wrapped the "View Details" `Button` in a `Link` component, directing to `/app/listings/${product.id}`.
+- **Key Decisions & Configurations**:
+    - Used `useParams` to get the `listingId` from the URL.
+    - Ensured Supabase client is called with `supabaseAccessToken` and that the token is validated.
+    - Added loading states, error handling, and a "Listing not found" state to the detail page.
+    - Included a "Back to Listings" link for navigation.
+    - The detail page displays all relevant information from the `listing` table for the selected product.
+
+--- 
+
+### Feature: Dynamic Product Filtering - Refinements & Bug Fixes
+- **Date**: 2024-07-29
+- **Task File**: Ongoing improvements to `prompt/Implement Dynamic Filters & Product Discovery Enhancements.md`.
+- **PRD Reference**: Section 2: "Dynamic Filters & Product Discovery (For Buyers)"
+- **Summary & Troubleshooting**:
+    - Addressed a recurring "Cannot update a component (`ListingsPage`) while rendering a different component (`FiltersPanel`)" error.
+        - Initial fix involved deferring `setCurrentFilters` and `setFilteredProducts` state updates in `app/app/listings/page.tsx` using `setTimeout(0, ...)`. This was noted in the original feature implementation (2024-07-27/28).
+        - The error resurfaced when a `setTimeout` was temporarily removed from `setFilteredProducts` in an attempt to fix a filter application bug. The `setTimeout` was reinstated.
+    - Resolved an issue where listings would not reappear correctly when a filter combination was deselected.
+        - Refactored filter application logic in `app/app/listings/page.tsx`:
+            - `handleFilterChange` now only defers `setCurrentFilters` and manages preference saving.
+            - A new `useEffect` hook, dependent on `currentFilters` and `allProducts` (and `initialFiltersLoaded`), is now responsible for calling `applyFiltersToList`.
+            - This change aimed to provide a clearer data flow for React state updates.
+    - Fixed a bug specific to the "Size" filter where listings would not reappear correctly.
+        - The root cause was a mismatch between the numeric values used by the `Slider` component in `FiltersPanel.tsx` (e.g., 1, 2, 3) and the string values expected by the `ListingsPage` and stored in product data (e.g., "Small", "Medium", "Large").
+        - **Fix**: Modified `components/app/FiltersPanel.tsx` to use mapping objects (`sizeMap`, `reverseSizeMap`) to ensure the size slider correctly converts between numeric slider values and string representations ("Small", "Medium", "Large") when setting filter state and communicating with `ListingsPage`.
+- **Key Technologies/Libraries Used**: (Primarily React state management and debugging)
+- **Files Modified**:
+    1. `app/app/listings/page.tsx`:
+        - Iteratively refined state update deferrals (`setTimeout`) for `setCurrentFilters` and `setFilteredProducts`.
+        - Restructured filter application to use a dedicated `useEffect` hook triggered by `currentFilters` and `allProducts` changes.
+    2. `components/app/FiltersPanel.tsx`:
+        - Implemented `sizeMap` and `reverseSizeMap` to handle the conversion between numeric slider values and string representations for the "Size" filter, ensuring consistency with product data.
+- **Key Decisions & Configurations**:
+    - Maintained deferred state updates (`setTimeout`) for `setCurrentFilters` in `handleFilterChange` and `fetchProductsAndPreferences`, and for `setFilteredProducts` in `applyFiltersToList` to prevent React rendering conflicts.
+    - Ensured `FiltersPanel.tsx` for the size slider emits and consumes filter values consistent with the `Product` data type (i.e., "Small", "Medium", "Large").
+
+--- 
+
+### Feature: Basic Cart Implementation (LocalStorage) & Add to Cart on Detail Page
+- **Date**: 2024-07-29
+- **Task File**: `prompt/Basic Cart & Checkout Flow for Buyers.md` (Steps 1 & part of 2)
+- **PRD Reference**: Section 3: "Shopping Cart & Checkout (For Buyers)" (assumed section from PRD.txt)
+- **Summary**:
+    - Created `types/cart.types.ts` defining `CartItem` and `CartState` (though `CartState` interface isn't fully utilized with current `useState` approach).
+    - Implemented a basic cart page at `app/app/cart/page.tsx`:
+        - Manages cart items using `useState` and `localStorage` for persistence across sessions/pages.
+        - Includes functions for adding, removing, updating quantity, and clearing the cart.
+        - Displays cart items, quantities, prices, and total.
+        - Uses `isMounted` state to prevent SSR hydration errors with `localStorage`.
+    - Added "Add to Cart" functionality to the Product Detail Page (`app/app/listings/[listingId]/page.tsx`):
+        - The button now reads from/writes to `localStorage` to add/update items in the cart.
+        - Integrated Shadcn/UI `Toast` components for user feedback on adding items.
+    - **Troubleshooting**:
+        - Resolved `uuid` module not found error by installing `uuid` and `@types/uuid`.
+        - Fixed `useToast` import path error: Changed from `@/components/ui/use-toast` to `@/hooks/use-toast`.
+        - Corrected usage of `useToast` hook by calling it at the top level of the component to get the `toast` function.
+- **Key Technologies/Libraries Used**:
+    - React (`useState`, `useEffect`, `useCallback`)
+    - `localStorage` API for cart persistence.
+    - `uuid` for generating unique cart item IDs.
+    - Shadcn/UI (`Card`, `Button`, `Input`, `Toast`, `Toaster`)
+    - Lucide React icons.
+- **Files Created**:
+    1. `types/cart.types.ts`
+    2. `app/app/cart/page.tsx`
+    3. `components/ui/toast.tsx` (via Shadcn CLI)
+    4. `hooks/use-toast.ts` (via Shadcn CLI)
+    5. `components/ui/toaster.tsx` (via Shadcn CLI)
+- **Files Modified**:
+    1. `app/app/listings/[listingId]/page.tsx`: Added "Add to Cart" logic using `localStorage` and toast notifications.
+    2. `package.json`, `pnpm-lock.yaml`: Added `uuid` and `@types/uuid`.
+    3. `components.json`: Updated by Shadcn CLI for `toast`.
+- **Key Decisions & Configurations**:
+    - Used `localStorage` for simple client-side cart persistence. A global state manager (Context, Zustand, Jotai) would be a more robust solution for larger applications but `localStorage` suffices for this stage.
+    - Ensured cart item IDs are unique using `uuid`.
+    - Added console logs for debugging cart operations.
+    - Used `isMounted` flag in `CartPage` to safely interact with `localStorage` only on the client side after hydration.
+- **CLI Commands Used**:
+    - `pnpm add uuid && pnpm add @types/uuid -D`
+    - `npx shadcn@latest add toast --yes`
+
+---
+
+### Refactor: Global Cart State Management with Zustand
+- **Date**: 2024-07-30 (Assumed date, please adjust if necessary)
+- **Summary**:
+    - Migrated cart state management from localStorage and component-level state (`useState` in `CartPage`) to a global Zustand store.
+    - This provides a centralized and more robust solution for managing cart data across different components.
+- **Key Technologies/Libraries Used**:
+    - Zustand (`zustand`)
+    - NextAuth.js (`useSession` for user context in store actions)
+    - Supabase (`saveProductToFavorites` utility for "Save for Later" feature)
+- **Files Created**:
+    1.  `store/cartStore.ts`: 
+        - Defines the `CartState` interface and the Zustand store (`useCartStore`).
+        - Includes actions for `addItem`, `removeItem`, `updateItemQuantity`, `clearCart`, and `saveItemForLater`.
+        - Manages persistence to `localStorage` using `persist` middleware from Zustand.
+        - Handles `isCartLoaded` state to track hydration from localStorage.
+        - `saveItemForLater` action integrates with `utils/supabase/favorites.ts`.
+- **Files Modified**:
+    1.  `app/app/cart/page.tsx`:
+        - Refactored to use `useCartStore` for all cart data and actions.
+        - Removed local state management for cart items and `isMounted`.
+        - Uses `isCartLoaded` from the store for loading UI.
+        - `handleSaveForLater` now calls the action from the Zustand store.
+    2.  `app/app/listings/[listingId]/page.tsx`:
+        - Refactored "Add to Cart" functionality to use `addItem` action from `useCartStore`.
+        - Removed direct localStorage manipulation for adding items.
+        - Resolved a linter error by removing `description` from `Product` type and its usage, relying on `care_details`.
+    3.  `components/app/Header.tsx`:
+        - Updated to display a dynamic cart item count using `getItemCount` from `useCartStore`.
+        - Shows count only after `isCartLoaded` is true to prevent displaying 0 during initial hydration.
+        - Added `ShoppingCart` icon to the "Cart" navigation link.
+        - Addressed linter errors by defining an explicit `NavItem` type and adjusting icon rendering.
+    4.  `types/index.ts`:
+        - Removed the optional `description` field from the `Product` interface to align with the database schema and fix linter errors.
+    5. `package.json`, `pnpm-lock.yaml`: Updated by `pnpm add zustand`.
+- **Key Decisions & Configurations**:
+    - Chose Zustand for its simplicity, small bundle size, and ease of use with React hooks for global state management.
+    - Cart data continues to be persisted in `localStorage` via Zustand's `persist` middleware.
+    - Ensured that UI components relying on cart data (CartPage, Header) correctly handle the initial hydration state from `localStorage` using the `isCartLoaded` flag from the store.
+    - The `productId` in `CartItem` (string) is parsed to an integer when interacting with the `favorite` table (which expects an integer `product_id`), highlighting a point of attention for data consistency if product IDs were not always numeric strings.
+- **CLI Commands Used**:
+    - `pnpm add zustand`
+
+---
+
+### Feature: Display and Manage Saved for Later Items
+- **Date**: 2024-07-30 (Assumed date, please adjust if necessary)
+- **Summary**:
+    - Implemented functionality for users to view and manage items they have saved for later.
+    - This involved fetching saved items, displaying them on the profile page, and providing actions to remove items or move them to the cart.
+- **Key Technologies/Libraries Used**:
+    - React (`useState`, `useEffect`, `useCallback`)
+    - Supabase (`fetchUserFavorites`, `removeProductFromFavorites` utility functions)
+    - NextAuth.js (`useSession` for user authentication)
+    - Zustand (`useCartStore` for moving items to cart)
+    - Shadcn/UI (`Card`, `Button`, `Toast`)
+    - Lucide React icons (`Trash2`, `ShoppingCart`, `AlertTriangle`)
+- **Files Created**:
+    1.  `components/app/profile/SavedItemsList.tsx`:
+        - Fetches and displays a list of the user's saved items (favorites).
+        - Each item shows product details (image, name, price) and a link to the product page.
+        - Provides a "Remove" button to delete an item from favorites (calls `removeProductFromFavorites`).
+        - Provides a "Move to Cart" button to add the item to the cart (using `useCartStore`) and then remove it from favorites.
+        - Handles loading, error (including login prompts), and empty states.
+- **Files Modified**:
+    1.  `utils/supabase/favorites.ts`:
+        - Added `fetchUserFavorites` function: Fetches all favorite records for a user and joins with the `listing` table to get product details. Includes logic to handle potential Supabase join syntax issues and type safety.
+        - Added `removeProductFromFavorites` function: Deletes a specific favorite record by its ID for the authenticated user.
+        - Exported `FavoriteWithListing` type for use in components.
+    2.  `app/app/profile/page.tsx`:
+        - Integrated the `SavedItemsList` component to display saved items below the "Profile & Billing" section.
+        - Added `<Toaster />` to ensure notifications from child components are rendered.
+- **Key Decisions & Configurations**:
+    - Saved items are displayed on the user's profile page.
+    - The `fetchUserFavorites` function in `utils/supabase/favorites.ts` uses an explicit join syntax (`listings!product_id(...)`) to ensure correct data retrieval from Supabase and handles cases where a linked listing might be missing.
+    - Moving an item to the cart also removes it from the saved list to prevent duplication and maintain clarity for the user.
+    - Error handling and loading states are managed within the `SavedItemsList` component.
+
+--- 
+
+### UI Fix: Button Visibility and Styling Enhancement
+- **Date**: 2024-07-31 
+- **Issue**: Multiple buttons across the application (e.g., "Add to Cart", "Checkout", "Back to Listings", seller flow buttons, "Continue Shopping") were appearing invisible or blending with the background due to issues with CSS variable application for primary colors.
+- **Summary of Fixes**:
+    1.  **Header**: Modified `components/app/Header.tsx` to use a direct dark background (`bg-slate-800`) and white text (`text-white`) to ensure consistent visibility, bypassing theme variable issues for this specific component.
+    2.  **Global Button Styles**:
+        - Investigated inconsistent application of `--primary` and `--primary-foreground` CSS variables from `app/globals.css`.
+        - Created utility classes in `app/globals.css`:
+            - `.force-primary-button`: Uses hardcoded hex colors (`#5059FE` background, `#FFFFFF` text) with `!important` for solid primary buttons. Added a hover effect (`#4048ED` background).
+            - `.force-outline-button`: Uses CSS variables (`--primary`, `--accent`) with `!important` for consistent outlined buttons.
+    3.  **Component Updates**:
+        - Applied `.force-primary-button` and `.force-outline-button` to affected buttons across various pages and components, including:
+            - Product Detail Page (`app/app/listings/[listingId]/page.tsx`): "Add to Cart", "Back to Listings".
+            - Cart Page (`app/app/cart/page.tsx`): "Checkout", "Clear Cart", "Continue Shopping".
+            - Seller Upload Flow (`app/app/seller/upload/page.tsx`, `components/app/PhotoUpload.tsx`, `components/app/ListingWizard.tsx`, `components/app/ListingPreview.tsx`): All primary and secondary action buttons in this flow.
+        - Refactored `components/CheckoutButton.tsx` to use the Shadcn/UI `Button` component with `variant="default"` and apply the `force-primary-button` class via props for consistent styling.
+- **Outcome**: Ensured critical action buttons are consistently visible with a primary blue background and white text, and outline buttons have a clear, consistent style. This provides a more visually appealing and usable interface.
+- **Key Files Modified**:
+    - `app/globals.css` (added `.force-primary-button`, `.force-outline-button` utility classes)
+    - `components/app/Header.tsx`
+    - `app/app/listings/[listingId]/page.tsx`
+    - `app/app/cart/page.tsx`
+    - `components/CheckoutButton.tsx`
+    - `app/app/seller/upload/page.tsx`
+    - `components/app/PhotoUpload.tsx`
+    - `components/app/ListingWizard.tsx`
+    - `components/app/ListingPreview.tsx`
+
+---
+
+### Feature: Seller Image Upload & Listing Preview Fixes
+- **Date**: 2024-08-01 (Assumed date, please adjust if necessary)
+- **Summary**:
+    - Resolved a TypeScript linter error in `app/app/seller/upload/page.tsx` related to the `ListingPreview` component.
+        - The error (`Object literal may only specify known properties, and 'images' does not exist in type 'Partial<ListingData>'`) occurred because `ListingPreview` expected `imageUrl: string | null` while `SellerUploadPage` was passing `images?: string[]`.
+        - **Fix**: Modified `components/app/ListingPreview.tsx` to update its `ListingData` interface to accept `images?: string[]` and to use the first image from this array for display. This aligned the prop types between the two components.
+    - Fixed an image loading error on the listing page after a new plant was uploaded.
+        - The error ("Invalid src prop ... hostname 'oaxkitlcltcmxwketlvz.supabase.co' is not configured under images in your `next.config.js`") was due to the Supabase storage hostname not being whitelisted for Next.js image optimization.
+        - **Fix**: Added `oaxkitlcltcmxwketlvz.supabase.co` to the `images.remotePatterns` in `next.config.ts`. User was instructed to restart the development server for the change to take effect.
+- **Key Technologies/Libraries Used**:
+    - Next.js (Image component, `next.config.ts`)
+    - TypeScript
+- **Files Modified**:
+    1.  `components/app/ListingPreview.tsx`: Updated `ListingData` interface and image handling logic.
+    2.  `next.config.ts`: Added Supabase hostname to `images.remotePatterns`.
+- **Outcome**: Sellers can now upload images which are correctly stored in Supabase Storage, and these images are properly displayed on both the preview step of the seller flow and on the public listing pages without errors. The application is ready for testing the creation of `care_task` entries upon successful Stripe checkout.
+
+---
+
+### Fix: `care_task` Creation and User ID Schema Alignment
+- **Date**: (Placeholder for actual date - YYYY-MM-DD) 
+- **Issue**: `care_task` entries were not being created after successful Stripe checkout due to a foreign key violation. The `public.care_task.user_id` column was referencing `auth.users(id)`, but user IDs from NextAuth.js sessions were not present in the `auth.users` table.
+- **Investigation Summary**:
+    - Initially, it was suspected that the user ID from the session was not present in `auth.users` even if the user was correctly authenticated by Supabase. This was complicated by confusion between `public.users` (populated by the NextAuth adapter), `next_auth.users` (also populated by the adapter and seems to be its primary schema), and Supabase's core `auth.users` table (which was found to be empty for application users).
+    - It was discovered that the `@auth/supabase-adapter` (v`^1.7.4` with `next-auth@5.0.0-beta.25`) was creating user records in `next_auth.users` (and also `public.users`) but NOT in Supabase's native `auth.users` table.
+    - The `user_id` in NextAuth.js sessions corresponds to entries in `next_auth.users` / `public.users`.
+- **Fix Applied**:
+    - The foreign key constraint on `public.care_task.user_id` was modified to reference `next_auth.users(id)` instead of `auth.users(id)`.
+    - SQL executed: 
+      ```sql
+      -- Step 1: Drop the existing foreign key constraint on public.care_task
+      ALTER TABLE public.care_task
+      DROP CONSTRAINT IF EXISTS care_task_user_id_fkey;
+
+      -- Step 2: Add the new foreign key constraint, referencing next_auth.users(id)
+      ALTER TABLE public.care_task
+      ADD CONSTRAINT care_task_user_id_fkey_next_auth -- New constraint name for clarity
+      FOREIGN KEY (user_id) REFERENCES next_auth.users(id);
+      ```
+- **Outcome**: `care_task` entries are now successfully created upon Stripe checkout, as the `user_id` from the session correctly matches an entry in the referenced `next_auth.users` table.
+- **Files Modified**:
+    1. `prompt/0-supabase-sql.md`: Updated `care_task` table definition to reflect the new foreign key reference to `next_auth.users(id)`.
+- **Further Considerations & Next Steps**:
+    - **RLS Policies**: Row Level Security policies using `auth.uid()` or `next_auth.uid()` (if it wraps `auth.uid()`) need to be revised as `auth.users` is not populated by the current NextAuth.js flow. RLS should be adapted to use user IDs from `next_auth.users`.
+    - **Schema Consistency**: Clarify if both `next_auth.users` and `public.users` are needed or if the adapter can be configured to use only one (preferably `next_auth.users` if that's its primary operational schema, or `public.users` if preferred and ensure all adapter tables go there). The goal is to avoid redundancy.
+    - **`auth.users` Population**: Investigate why the NextAuth.js flow with `@auth/supabase-adapter@^1.7.4` and `next-auth@5.0.0-beta.25` isn't populating Supabase's native `auth.users` table. This might be a beta version behavior, a configuration oversight, or require a different integration pattern if native Supabase auth features (like `auth.uid()` for RLS) are desired as the primary mechanism.
+
+### Fix: Row Level Security (RLS) Alignment with `next_auth.users`
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Issue**: RLS policies for tables like `listing`, `cart_item`, `favorite`, `care_task`, and `search_preference` were using `auth.uid()` (or `next_auth.uid()` which typically wraps `auth.uid()`). This relies on Supabase's `auth.users` table, which was not being populated by the NextAuth.js authentication flow. User identities for the app are managed in `next_auth.users`.
+- **Fix Applied**:
+    1.  **Created SQL Helper Function**: An SQL function `requesting_app_user_id()` was created to extract the user ID (originally from `next_auth.users.id`) from the `sub` claim of the JWT provided by NextAuth.js (specifically, the `supabaseAccessToken` generated in the session callback).
+        ```sql
+        CREATE OR REPLACE FUNCTION requesting_app_user_id()
+        RETURNS UUID
+        LANGUAGE SQL STABLE
+        AS $$
+          SELECT (auth.jwt()->>'sub')::uuid;
+        $$;
+        COMMENT ON FUNCTION requesting_app_user_id IS 'Retrieves the user ID (from next_auth.users) from the ''sub'' claim of the current JWT. Used for RLS.';
+        ```
+    2.  **Updated RLS Policies**: All relevant RLS policies were modified to use `requesting_app_user_id() = user_id` as the condition for accessing or modifying data. This ensures policies are checked against the application's user ID from the `next_auth.users` table.
+- **Outcome**: RLS policies now correctly align with the application's user identity system, ensuring users can only access/modify their own data as intended across various features.
+- **Files Modified**:
+    1. `prompt/0-supabase-sql.md`: Added the `requesting_app_user_id()` function definition and updated all relevant RLS policies to use this new function.
+- **Further Considerations**:
+    - **Schema Consistency (`public.users` vs. `next_auth.users`)**: The `@auth/supabase-adapter` appears to be populating both `public.users` and `next_auth.users`. This redundancy should be investigated. The goal is for the adapter to consistently use the intended `next_auth` schema for all its tables (`users`, `accounts`, `sessions`, `verification_tokens`) and avoid populating `public.users` if it's not explicitly needed for other purposes.
+    - **`auth.users` Non-population**: The underlying reason why the NextAuth.js flow with `@auth/supabase-adapter@^1.7.4` and `next-auth@5.0.0-beta.25` does not populate Supabase's native `auth.users` table remains. While the current RLS fix works with `next_auth.users`, understanding this behavior is important for long-term strategy, especially if deeper integration with Supabase-native auth features is ever desired.
+
+### Clarification: Supabase Auth Schema Strategy & NextAuth.js Integration
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Context**: Ongoing work to stabilize user identity management and data access (RLS, foreign keys) after integrating NextAuth.js (v5 beta with `@auth/supabase-adapter`).
+- **Key Decisions & Observations**:
+    1.  **Primary User Identity Table**: The `next_auth.users` table (within the user-created `next_auth` schema) is designated as the **primary source of truth for application user identities**. All foreign keys that reference a user ID (e.g., `care_task.user_id`, `listing.user_id`, etc.) should and now do point to `next_auth.users(id)`.
+    2.  **Supabase Native `auth.users` Table**: It is confirmed that the current NextAuth.js setup (`@auth/supabase-adapter@^1.7.4` with `next-auth@5.0.0-beta.25`) **does NOT populate Supabase's native `auth.users` table**. This means Supabase-native functions like `auth.uid()` cannot be directly used for RLS if they rely on `auth.users` entries.
+    3.  **RLS Implementation**: Row Level Security policies for all user-specific tables have been updated to use a custom SQL function `requesting_app_user_id()`. This function extracts the user ID (which corresponds to `next_auth.users.id`) from the `sub` claim of the JWT provided by NextAuth.js (specifically, the `supabaseAccessToken` generated in the `lib/auth.config.ts` session callback).
+        ```sql
+        -- Helper function defined in 0-supabase-sql.md
+        CREATE OR REPLACE FUNCTION requesting_app_user_id()
+        RETURNS UUID LANGUAGE SQL STABLE AS $$
+          SELECT (auth.jwt()->>'sub')::uuid;
+        $$;
+        ```
+    4.  **`public.users` Table Redundancy**: The `@auth/supabase-adapter` is also populating a `users` table within the `public` schema (i.e., `public.users`). While this table mirrors data in `next_auth.users`, it is currently considered redundant for the application's core logic and RLS, which are now standardized on `next_auth.users`. 
+        - **Future Action**: Consider investigating if the adapter can be configured to use *only* the `next_auth` schema for all its tables (`users`, `accounts`, `sessions`, `verification_tokens`) to eliminate this redundancy. This might involve reviewing adapter options or the schema settings during its initialization. If `public.users` serves no other distinct purpose, its population by the adapter is unnecessary.
+    5.  **NextAuth.js Adapter Configuration**: The adapter is initialized in `lib/auth.config.ts` using `SupabaseAdapter({ client: supabase, options: { schema: "next_auth" } })`. This explicitly directs the adapter to use the `next_auth` schema for its operations. The continued population of `public.users` despite this specific schema option is a point of interest.
+- **Current State**: The application is functional with this setup. User authentication, `care_task` creation, and RLS are working based on user identities stored in `next_auth.users`.
+- **Impact**: This setup means the application relies on the JWT's `sub` claim (managed via NextAuth.js session and its `supabaseAccessToken`) as the definitive link to user identity for database operations, rather than Supabase's built-in `auth.users` table and `auth.uid()` function directly.
+
+---
+
+### Feature: Conversational Chat Interface for Buyers (Simulated AI)
+- **Date**: (Placeholder for actual date - YYYY-MM-DD) 
+- **Task File**: `prompt/Conversational Chat Interface for Buyers.md`
+- **PRD Reference**: Section 3: "Conversational AI Shopping Experience" in `prompt/PRD.txt`
+- **Summary**:
+    - Implemented a user-facing chat interface at `app/app/chat/page.tsx`.
+    - Developed the core `Chat` component (`components/app/Chat.tsx`) featuring:
+        - Message display area with distinct styles for user and AI.
+        - Text input for user queries.
+        - Auto-scrolling to the latest message.
+        - Quick reply buttons for common queries.
+        - Placeholder icons for voice and camera input (triggering toast notifications).
+        - Loading indicator while the AI (simulated) is responding.
+    - AI responses are currently **simulated** with a keyword-based mock function (`simulateAiResponse`) providing predefined plant suggestions with images, scores, and explanations.
+    - An initial greeting message is displayed from the AI when the chat loads.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router)
+    - React (`useState`, `useEffect`, `useRef`)
+    - TypeScript
+    - Shadcn/UI (`Input`, `Button`, `ScrollArea`, `Avatar`, `Toast`)
+    - Lucide React (`Mic`, `SendHorizontal`, `Camera`, `Loader2`)
+    - Tailwind CSS
+- **Files Created**:
+    1. `app/app/chat/page.tsx`
+    2. `components/app/Chat.tsx`
+- **Files Modified**:
+    - (Implicitly) `components.json` if `scroll-area` or `avatar` were not previously added by Shadcn CLI.
+- **Key Decisions & Configurations**:
+    - Focused on building the UI and UX of the chat interface as per the task file.
+    - Implemented simulated AI responses to allow for frontend development and testing before integrating a live AI service.
+    - Used `calc(100vh - var(--header-height, 80px))` for the chat container height to ensure it fits within the viewport below the header.
+    - Added `picsum.photos` for mock plant suggestion images.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add scroll-area avatar --yes` (if not already present)
+
+### Feature: Conversational Chat Interface - Gemini API Integration
+- **Date**: 2024-08-01 (Assumed date, please adjust if necessary)
+- **Task File Reference**: `prompt/Conversational Chat Interface for Buyers.md` (moving from simulated to real AI)
+- **PRD Reference**: Section 3: "Conversational AI Shopping Experience" in `prompt/PRD.txt`
+- **Summary**:
+    - Replaced the simulated AI response mechanism in the buyer-facing chat with a direct integration to the Google Gemini API.
+    - Created a new Next.js API route (`app/api/chat/gemini/route.ts`) to handle communication with the Gemini API.
+    - Utilized the `@google/generative-ai` Node.js SDK.
+    - Configured the API route to use the `models/gemini-2.5-flash-preview-05-20` model.
+    - Implemented a system prompt to define Planty's personality, goals, and conversational boundaries.
+    - Updated `components/app/Chat.tsx` to call the new API route, sending the user's message and chat history.
+    - Addressed initial errors related to chat history formatting (ensuring the first message in a session sent to the API is from the user) and system instruction formatting (providing it as a `Content` object with a `role`).
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router, API Routes)
+    - React (`useState`, `useEffect`, `fetch` API)
+    - TypeScript
+    - `@google/generative-ai` (Node.js SDK for Gemini)
+- **Files Created**:
+    1. `app/api/chat/gemini/route.ts`
+- **Files Modified**:
+    1. `components/app/Chat.tsx`: Updated `handleSubmit` to call the new Gemini API route, removed `simulateAiResponse`.
+    2. `app/api/chat/gemini/route.ts` (iteratively): Added system prompt, refined history and system instruction formatting.
+    3. `package.json`, `pnpm-lock.yaml`: Added `@google/generative-ai`.
+- **Key Decisions & Configurations**:
+    - Chose `models/gemini-2.5-flash-preview-05-20` as the specific Gemini model.
+    - Implemented a detailed system prompt to guide AI behavior.
+    - Ensured chat history sent to the API correctly alternates user/model roles and handles the initial frontend greeting appropriately.
+    - Formatted `systemInstruction` as `{ role: "user", parts: [{ text: "..." }] }` based on API requirements.
+- **CLI Commands Used**:
+    - `pnpm add @google/generative-ai`
+- **Current Status**: Basic text-based chat with Gemini is functional. Next steps include enhancing response formatting for better visual appeal and exploring structured output for richer suggestions.
+
+---
+
+### Fix: RLS Policy Correction for Marketplace Listing Visibility & Ownership
+- **Date**: 2024-08-02
+- **Issue**: 
+    - Listings were only visible to their owners due to the `SELECT` RLS policy on `public.listing` being `USING (requesting_app_user_id() = user_id)`. This prevented the intended marketplace functionality where all authenticated users could browse listings.
+    - There was also an inconsistency where `INSERT`, `UPDATE`, `DELETE` policies for `public.listing` were (at one point, as per database output) using `auth.uid()` instead of `requesting_app_user_id()`, which conflicts with the NextAuth.js user ID system (`next_auth.users`).
+- **Fix Applied**:
+    - The `SELECT` RLS policy on `public.listing` was changed to `USING (auth.role() = 'authenticated')`. This allows all logged-in users to view all listings. The policy name is now "Authenticated users can view all listings".
+    - The `INSERT`, `UPDATE`, and `DELETE` RLS policies on `public.listing` were explicitly set/confirmed to use `requesting_app_user_id() = user_id`. This ensures that only the legitimate owner of a listing (identified via the JWT and `next_auth.users` table) can create, modify, or delete their own listings.
+        - INSERT policy: "Authenticated users can insert new listings" `WITH CHECK (requesting_app_user_id() = user_id)`
+        - UPDATE policy: "Owners can update their listings" `USING (requesting_app_user_id() = user_id) WITH CHECK (requesting_app_user_id() = user_id)`
+        - DELETE policy: "Owners can delete their listings" `USING (requesting_app_user_id() = user_id)`
+- **Outcome**: 
+    - Listings are now publicly viewable by all authenticated users, enabling the core marketplace browsing experience.
+    - Ownership controls for creating, updating, and deleting listings are correctly and consistently enforced based on the application's `next_auth.users` identity system.
+- **Files Modified**: 
+    - `prompt/0-supabase-sql.md`: Updated to reflect the correct RLS policies for the `public.listing` table.
+- **Key SQL Executed (in Supabase Studio)**:
+    ```sql
+    -- For SELECT
+    DROP POLICY IF EXISTS "Select listing policy" ON public.listing; 
+    DROP POLICY IF EXISTS "Authenticated users can view all listings" ON public.listing; 
+    CREATE POLICY "Authenticated users can view all listings"
+    ON public.listing
+    FOR SELECT
+    USING (auth.role() = 'authenticated');
+
+    -- For INSERT
+    DROP POLICY IF EXISTS "Insert listing policy" ON public.listing; 
+    DROP POLICY IF EXISTS "Authenticated users can insert new listings" ON public.listing;
+    CREATE POLICY "Authenticated users can insert new listings"
+    ON public.listing
+    FOR INSERT
+    WITH CHECK (requesting_app_user_id() = user_id);
+
+    -- For UPDATE
+    DROP POLICY IF EXISTS "Update listing policy" ON public.listing;
+    DROP POLICY IF EXISTS "Owners can update their listings" ON public.listing;
+    CREATE POLICY "Owners can update their listings"
+    ON public.listing
+    FOR UPDATE
+    USING (requesting_app_user_id() = user_id)
+    WITH CHECK (requesting_app_user_id() = user_id);
+
+    -- For DELETE
+    DROP POLICY IF EXISTS "Delete listing policy" ON public.listing;
+    DROP POLICY IF EXISTS "Owners can delete their listings" ON public.listing;
+    CREATE POLICY "Owners can delete their listings"
+    ON public.listing
+    FOR DELETE
+    USING (requesting_app_user_id() = user_id);
+    ```
+
+---
+
+### Fix: Chat API JSON Parsing Robustness
+- **Date**: 2024-08-03
+- **Issue**: JSON responses from the Gemini API for plant recommendations in the chat feature were sometimes truncated or malformed, leading to parsing errors in `app/api/chat/gemini/route.ts`. This typically occurred when the response was long (e.g., multiple suggestions with detailed image URLs).
+- **Fix Applied**:
+    - Increased `maxOutputTokens` in the `generationConfig` for the Gemini model from `1000` to `2048` in `app/api/chat/gemini/route.ts` to allow for more complete responses.
+    - Refined the JSON extraction logic within the API route:
+        - The primary method remains parsing JSON from blocks explicitly marked with ```json ... ```.
+        - The fallback mechanism was made more cautious, only attempting to parse the entire raw response if it demonstrably starts with `{` and ends with `}` (after trimming).
+        - Improved error logging for JSON parsing attempts.
+- **Outcome**: More reliable parsing of structured JSON recommendations from the Gemini API, significantly reducing errors due to truncated or improperly formatted responses. The chat feature can now handle more detailed AI suggestions.
+- **Files Modified**: `app/api/chat/gemini/route.ts`.
+
+---
+
+### Fix: Profile Page Favorites Fetching Error
+- **Date**: 2024-08-03
+- **Issue**: The user's profile page (`/app/app/profile`) was failing to load saved/favorited items, often showing a vague error like `[fetchUserFavorites] Error fetching user favorites: {}`, especially noticeable after redirects (e.g., from Stripe checkout).
+- **Investigation**:
+    - The primary cause was an incorrect Supabase join syntax in the `fetchUserFavorites` function within `utils/supabase/favorites.ts`. It was attempting to join with `listings!product_id(...)` instead of the correct singular table name `listing` and a more standard join.
+    - Subsequent linter errors revealed TypeScript type mismatches: `productId` (for saving) and `favoriteId` (for removing) were typed as `number`, while the Supabase schema (and thus expected types for Supabase client operations) used `UUID` (string) for these identifiers in the `favorite` table.
+- **Fix Applied**:
+    - In `utils/supabase/favorites.ts`:
+        - Corrected the Supabase join in `fetchUserFavorites` to `listing:listing(id, species, ...)` for clarity and correctness.
+        - Changed the parameter types for `productId` in the `saveProductToFavorites` function and `favoriteId` in the `removeProductFromFavorites` function from `number` to `string`.
+- **Outcome**: User favorites now load correctly and reliably on the profile page. Operations for adding and removing favorites are type-safe and function as expected.
+- **Files Modified**: `utils/supabase/favorites.ts`.
+
+---
+
+### Fix: Care Calendar Task Loading Error (Incorrect Column)
+- **Date**: 2024-08-03
+- **Issue**: The Care Calendar page (`/app/app/care-calendar`) was failing to load tasks, displaying an error: "Failed to load care tasks: column listing_1.name does not exist".
+- **Investigation**: The Supabase query in the `fetchCareTasks` function within `app/app/care-calendar/page.tsx` was attempting to select a `name` column from the joined `listing` table. However, the `listing` table schema uses `species` for the plant's name/type.
+- **Fix Applied**:
+    - In `app/app/care-calendar/page.tsx`:
+        - Modified the `.select()` statement in `fetchCareTasks` to request `listing:listing_id(species)` instead of `listing_id(name)`.
+        - Updated the data mapping logic to use `task.listing?.species` when setting the `plant_name` for display.
+- **Outcome**: Care tasks now load correctly on the Care Calendar page, displaying the appropriate plant species associated with each task.
+- **Files Modified**: `app/app/care-calendar/page.tsx`.

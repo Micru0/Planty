@@ -1,0 +1,165 @@
+Below is a proposed feature/task breakdown for Planty. Each task is scoped with a clear user story, describes the expected UI flow and state/data points, and follows the guidelines (starting with the overall layout/UI). Note that every component and styling uses shadcn/ui and Tailwind’s built-in CSS variable classes. The plan is arranged in an order that first builds the foundational UI, then progressively implements key buyer and seller journeys.
+
+────────────────────────────
+1. Task: Overall Layout & Core UI Implementation
+
+• User Story:
+ “As a user (buyer or seller) visiting Planty, I want to immediately see a clean, responsive, and well-organized application layout so I can easily navigate settings, view conversations, or start listing my plant.”
+
+• Scope & Details:
+ – Implement the overall page layout in app/app/page.tsx.  
+ – Update the existing Header.tsx (in components/app) to adjust its styling to match Planty’s visual language (e.g., use bg-primary for header background, text-primary-foreground, and appropriate spacing).  
+ – Define a consistent navigation scheme (e.g., a top navigation bar for desktop and a bottom navigation or FAB for mobile) using shadcn/ui components.  
+ – Ensure the layout is mobile-first with responsive Tailwind CSS classes.  
+
+• UI Details:
+ – Header with Planty logo/name, navigation links (e.g., “Chat”, “Listings”, “Cart”)  
+ – A main content container that will later render dynamic components for chat, listings, etc.  
+ – Responsive breakpoints defined through Tailwind (mobile-first, then expand to larger screens).  
+
+• State & Data Points:
+ – Global theme state (if needed, via context)  
+ – Navigation state (active link highlighting)
+
+────────────────────────────
+2. Task: Conversational Chat Interface for Buyers
+
+• User Story:
+ “As a buyer, I want to interact with a natural language chat interface so that I can ask for advice like ‘Show me pet-safe plants for my balcony’ and receive dynamic, AI-driven suggestions.”
+
+• Scope & Details:
+ – Develop a Chat component using shadcn/ui (e.g., message bubbles, text inputs, quick-reply chips) that fits intuitively within the overall layout.  
+ – Provide a scrollable conversation area which displays messages paired with match scores and explanations (for each plant suggestion).  
+ – Add a voice search button and a camera shortcut icon (using Lucide React) that is always visible at the bottom of the chat for multimodal input.  
+ – Integrate a persistent chat state (using useState or useReducer) that stores current session messages.  
+
+• UI Details:
+ – Header section (e.g., with the chat title “Planty Chat”)  
+ – Message list with alternating styling for user vs. AI messages  
+ – Input area with text field, quick-reply chips below, and icons on the side  
+ – Use Tailwind variables (e.g., bg-primary, text-primary-foreground) for consistent styling.  
+
+• State & Data Points:
+ – chatSessionId, an array of message objects (each with id, sender, timestamp, text, and optional AI suggestion scores)  
+ – Pending message state and UI loading state during AI suggestion generation  
+
+────────────────────────────
+3. Task: Seller Photo Upload & AI Plant Recognition Component
+
+• User Story:
+ “As a seller, I want to quickly upload a plant photo that automatically detects species, care needs, and suggested pricing so that I can create a listing in seconds with a high degree of confidence.”
+
+• Scope & Details:
+ – Build a Photo Upload Component using shadcn UI’s file input elements with support for multi-image (if needed).  
+ – Integrate a real image recognition library (do not use a placeholder) to simulate AI analysis. Show a loading indicator (using a spinner from shadcn/ui) while processing the image.  
+ – Once the image is processed, display detection results including species, care suggestions, and pricing suggestions with confidence ratings. Allow fields to be editable.  
+ – Use card-based UI to group the AI suggestions and image preview.
+
+• UI Details:
+ – An upload area (drag-and-drop or click-to-select) styled with Tailwind colors  
+ – A preview card: image on one side and a panel showing auto-filled data (with icons from Lucide React for each detail such as care, pricing)  
+ – Edit controls (inline text inputs or dropdowns) for user corrections  
+  
+• State & Data Points:
+ – Uploaded image file state  
+ – AI result object: { species, careNeeds, suggestedPrice, confidence }  
+ – Editable form state for any AI-overridden details
+
+────────────────────────────
+4. Task: Seller Listing & Publishing Flow
+
+• User Story:
+ “As a seller, after uploading a plant photo, I want to preview my listing with side-by-side comparisons to similar products so I can confirm the details and publish my listing confidently.”
+
+• Scope & Details:
+ – Create a multi-step flow:  
+  ◦ Step 1: Photo upload with AI detection (from Task 3)  
+  ◦ Step 2: Edit and adjust AI-provided details (using a card-based UI with shadcn components)  
+  ◦ Step 3: Preview listing with a side-by-side view comparing the new listing with similar market products (a static placeholder list or integrated with another component for suggestions)  
+  ◦ Step 4: Publish the listing which updates the backend (Supabase integration for writing to user_listings table).
+
+• UI Details:
+ – Wizard-style progress indicator at the top of the flow  
+ – Each step uses clear, well-spaced form controls  
+ – Use shadcn/ui buttons (styled with bg-primary) for “Next”, “Back”, and “Publish”  
+ – Preview page displays: plant image, AI suggestions, editable fields and smart tags
+
+• State & Data Points:
+ – Listing data state object: { images, species, price, careDetails, tags }  
+ – Preview mode flag and edit mode toggle  
+ – Connection to Supabase (via existing utils) for saving listing data
+ 
+────────────────────────────
+5. Task: Basic Cart & Checkout Flow for Buyers
+
+• User Story:
+ “As a buyer, I want to add desired plants to my cart and proceed with an easy, secure checkout process so that I can quickly complete my purchase.”
+
+• Scope & Details:
+ – Implement a cart component that displays added products.  
+ – Integrate with the existing Stripe CheckoutButton (already in the template) ensuring the new cart design fits Planty’s styling.  
+ – Allow users to “Add to Cart” from product detail pages (product pages can be created as part of the extended product listing module).
+ – Create a “Save for Later” option that persists in the favorites table.
+
+• UI Details:
+ – Cart page using a card/grid layout that displays plant image, name, price, and quantity controls.  
+ – Clear “Checkout” button styled with shadcn/ui components 
+ – Use responsive design for mobile: cart summary shown in a bottom sheet or modal.
+
+• State & Data Points:
+ – Cart state array: each element with product_id, quantity, price  
+ – Checkout state representing purchase progress (integrated with Stripe flow from existing template)  
+ – Favorite items state (persisted to Supabase via existing utilities)
+
+────────────────────────────
+6. Task: Care Calendar Generation Post-Purchase
+
+• User Story:
+ “As a buyer who has completed a purchase, I want to see an auto-generated care calendar with personalized reminders so I can care for my new plant easily.”
+
+• Scope & Details:
+ – Once the purchase is confirmed (using the checkout flow from Task 5), automatically generate a care calendar.  
+ – Create a Care Calendar component that displays the schedule, care tasks, and reminders (e.g., watering, fertilizing).  
+ – Utilize a calendar view or list view styled with shadcn/ui components.  
+ – Include a “Notification Reminder” test setup (e.g., using browser notifications or in-app alerts).
+
+• UI Details:
+ – Calendar or list view with clearly segmented days  
+ – Each task displays the care instruction, time, and a “mark as done” checkbox  
+ – Use Tailwind classes (like bg-primary for highlight buttons) to maintain visual consistency
+
+• State & Data Points:
+ – Care schedule object linked to the purchase id: { task, dueDate, completed }  
+ – Local state for toggling tasks as completed  
+ – Integration with user notifications (stubs may be used initially)
+
+────────────────────────────
+7. Task: Implement Dynamic Filters & Product Discovery Enhancements
+
+• User Story:
+ “As a buyer, I want to filter plants by parameters (light level, size, watering frequency) and see personalized recommendations based on my past chats and purchase habits so that I can easily find the perfect plant.”
+
+• Scope & Details:
+ – Create a Filters Panel component using shadcn/ui elements (checkboxes, sliders, dropdowns).  
+ – Integrate filter choices with the product listing view to update displayed results in real time.  
+ – Maintain the filter state and user search preferences (persisted to Supabase under search_preferences).  
+ – Use a stateful context or useState hook to store current filter selections and update the UI accordingly.
+
+• UI Details:
+ – A collapsible side-bar (or a modal on mobile) for filters  
+ – Display of active filters, with options to clear all  
+ – Incorporate minimal animations (using CSS transitions) for when the filter panel opens/closes
+
+• State & Data Points:
+ – Filter state (object: { lightLevel, size, wateringFrequency, ... })  
+ – Product list state that gets filtered accordingly  
+ – Persisted preferences used to tailor future AI suggestions in chat
+
+────────────────────────────
+Additional Considerations
+
+• For all tasks, ensure that the UI components use shadcn/ui (import from '@/components/ui') and Tailwind classes that reference built-in color variables (e.g., bg-primary, text-primary-foreground).
+• The mobile-first approach should be baked into each component (using responsive Tailwind classes).
+• Although testing and analytics aren’t separate tasks, consider briefly adding state flags or logs (e.g., on AI acceptance vs. edits) to track KPI metrics for future phases.
+
+Following this roadmap will enable the team to iteratively build a fully functional Planty application—from foundational layout through the conversational experience to the end-to-end seller and buyer journeys—while meeting all design and integration requirements.

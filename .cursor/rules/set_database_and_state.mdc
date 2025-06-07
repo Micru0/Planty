@@ -1,0 +1,190 @@
+Below are two clear sections outlining a minimal database schema and a corresponding set of TypeScript state interfaces. The schema is designed to support only the absolutely necessary data for the Planty UI components and flows described, and the state management definitions mirror the core “slices” of UI state needed in a simple, maintainable format.
+
+────────────────────────────
+1. DATABASE SCHEMA
+
+Each table includes an id column defined as “identity generated always” for auto-incrementation. When a table is meant to be user‑specific, a user_id column is added with a default of next_auth.uid(). Table and column names are lowercase and singular, and no table name matches any column name.
+
+Below are sample tables for key features:
+
+----------------------------------------------------------------
+-- Table for Chat Messages (Task 2)
+----------------------------------------------------------------
+create table chat_message (
+  id integer generated always as identity primary key,
+  chat_session_id uuid not null,
+  sender text not null,  -- e.g. 'user' or 'ai'
+  text text not null,
+  score numeric,         -- optional AI suggestion confidence/score
+  timestamp timestamptz not null default now()
+);
+
+----------------------------------------------------------------
+-- Table for Seller Listings (Tasks 3 & 4)
+----------------------------------------------------------------
+create table listing (
+  id integer generated always as identity primary key,
+  images text[] not null,       -- array of image URLs
+  species text not null,
+  price numeric(10,2) not null,
+  care_details text not null,
+  tags text[],                  -- optional array of smart tags
+  user_id uuid not null default next_auth.uid(),  -- seller owner
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+----------------------------------------------------------------
+-- Table for Cart Items (Task 5)
+----------------------------------------------------------------
+create table cart_item (
+  id integer generated always as identity primary key,
+  product_id uuid not null,      -- referring to listing id
+  quantity integer not null,
+  price numeric(10,2) not null,  -- capture price at adding to cart
+  user_id uuid not null default next_auth.uid()
+);
+
+----------------------------------------------------------------
+-- Table for Favorites (Task 5 “Save for Later”)
+----------------------------------------------------------------
+create table favorite (
+  id integer generated always as identity primary key,
+  product_id uuid not null,      -- referring to listing id
+  user_id uuid not null default next_auth.uid()
+);
+
+----------------------------------------------------------------
+-- Table for Care Tasks (Task 6)
+----------------------------------------------------------------
+create table care_task (
+  id integer generated always as identity primary key,
+  purchase_id uuid not null,     -- identifier for the purchase
+  task text not null,            -- description of the care instruction
+  due_date date not null,
+  completed boolean not null default false,
+  user_id uuid not null default next_auth.uid()
+);
+
+----------------------------------------------------------------
+-- Table for Search Preferences (Task 7)
+----------------------------------------------------------------
+create table search_preference (
+  id integer generated always as identity primary key,
+  light_level text,              -- e.g., "low", "medium", "high"
+  size text,                     -- e.g., "small", "medium", "large"
+  watering_frequency text,       -- e.g., "daily", "weekly", etc.
+  user_id uuid not null default next_auth.uid()
+);
+
+────────────────────────────
+2. STATE MANAGEMENT
+
+Below are simplified TypeScript interfaces capturing the UI state for the core features in Planty. These interfaces follow a minimal pattern to ensure clarity and maintainability.
+
+----------------------------------------------------------------
+• Chat State (Task 2)
+----------------------------------------------------------------
+export interface ChatMessage {
+  id: string;
+  chatSessionId: string;
+  sender: 'user' | 'ai';
+  text: string;
+  score?: number;
+  timestamp: Date;
+}
+
+export interface ChatState {
+  chatSessionId: string;
+  messages: ChatMessage[];
+  pendingMessage: string;
+  // Actions:
+  setMessages: (messages: ChatMessage[]) => void;
+  addMessage: (message: ChatMessage) => void;
+  clearMessages: () => void;
+}
+
+----------------------------------------------------------------
+• Listing State for Seller Flows (Tasks 3 & 4)
+----------------------------------------------------------------
+export interface Listing {
+  id: string;
+  images: string[];
+  species: string;
+  price: number;
+  careDetails: string;
+  tags?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ListingState {
+  currentListing: Listing | null;
+  listings: Listing[];
+  // Actions:
+  setCurrentListing: (listing: Listing | null) => void;
+  updateCurrentListing: (updates: Partial<Listing>) => void;
+  addListing: (listing: Listing) => void;
+  removeListing: (listingId: string) => void;
+  setListings: (listings: Listing[]) => void;
+}
+
+----------------------------------------------------------------
+• Cart State (Task 5)
+----------------------------------------------------------------
+export interface CartItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  price: number;
+}
+
+export interface CartState {
+  items: CartItem[];
+  // Actions:
+  addItem: (item: CartItem) => void;
+  removeItem: (itemId: string) => void;
+  updateItemQuantity: (itemId: string, quantity: number) => void;
+  clearCart: () => void;
+}
+
+----------------------------------------------------------------
+• Care Calendar State (Task 6)
+----------------------------------------------------------------
+export interface CareTask {
+  id: string;
+  task: string;
+  dueDate: Date;
+  completed: boolean;
+}
+
+export interface CareCalendarState {
+  tasks: CareTask[];
+  // Actions:
+  markTaskCompleted: (taskId: string) => void;
+  setTasks: (tasks: CareTask[]) => void;
+}
+
+----------------------------------------------------------------
+• Filters State for Product Discovery (Task 7)
+----------------------------------------------------------------
+export interface Filters {
+  lightLevel?: string;
+  size?: string;
+  wateringFrequency?: string;
+}
+
+export interface FiltersState {
+  filters: Filters;
+  // Actions:
+  setFilters: (filters: Filters) => void;
+  clearFilters: () => void;
+}
+
+────────────────────────────
+Summary
+
+• The database schema is kept minimal while capturing only the necessary fields needed to drive the UI for chat, listings, cart, favorites, care reminders, and filter preferences.  
+• The corresponding state management interfaces focus on reflecting the UI state slices—each with clear actions to update state in a simple, maintainable way.
+
+This design keeps both your backend and frontend efficient, fostering rapid development of the Planty user journeys with a clean separation between persistent data and in‐memory UI state.

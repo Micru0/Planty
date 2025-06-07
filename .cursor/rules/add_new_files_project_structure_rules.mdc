@@ -1,0 +1,94 @@
+Below is one example of a minimal “Planty” project structure built on top of the Next.js SaaS Starter Template. This layout adds only the new pages, components, and a couple of utilities needed for the Planty user stories while keeping the existing auth, payment, and Supabase setup intact.
+
+----------------------------------------------------------------
+Project Root
+----------------------------------------------------------------
+├── app/                                  ← Next.js App directory (App Router)
+│   ├── app/                              ← Authenticated application routes (Planty “dashboard”)
+│   │   ├── page.tsx                      ← Overall layout & core UI (Task 1)
+│   │   ├── chat/                         ← Conversational Chat Interface for buyers (Task 2)
+│   │   │   └── page.tsx                  ← Chat page (renders Chat component)
+│   │   ├── seller/                       ← Seller-specific flows
+│   │   │   ├── upload/                   ← Seller photo upload & AI recognition (Task 3)
+│   │   │   │   └── page.tsx              ← Upload page with AI processing
+│   │   │   └── listing/                  ← Seller listing & publishing flow (Task 4)
+│   │   │       └── page.tsx              ← Multi-step wizard for listing creation
+│   │   ├── cart/                         ← Cart & Checkout flow for buyers (Task 5)
+│   │   │   └── page.tsx                  ← Cart page (integrates with Stripe CheckoutButton)
+│   │   ├── care-calendar/                ← Care Calendar generation page (Task 6)
+│   │   │   └── page.tsx                  ← Auto-generated care calendar after purchase
+│   │   └── listings/                     ← Product discovery with dynamic filters (Task 7)
+│   │       └── page.tsx                  ← Listings/catalog page (uses Filters Panel)
+│   │
+│   ├── actions/                          ← Server actions (existing)
+│   │   ├── auth.ts                       ← Authentication actions (existing)
+│   │   └── stripe.ts                     ← Stripe payment actions (existing)
+│   │
+│   ├── api/                              ← API routes for external services (existing)
+│   │   ├── auth/                        ← Authentication API endpoints (existing)
+│   │   ├── (payment)/                   ← Payment-related endpoints (existing)
+│   │   ├── profile/                     ← User profile endpoints (existing)
+│   │   └── webhook/                     ← Webhook handlers (existing)
+│   │
+│   ├── success/                          ← Success pages (e.g., post-payment) (existing)
+│   ├── layout.tsx                        ← Root layout with providers (existing)
+│   └── page.tsx                          ← Public landing page (existing)
+│
+├── components/                           ← Reusable React components
+│   ├── app/                              ← App-specific components for Planty
+│   │   ├── Header.tsx                    ← Updated Header (Task 1: Planty logo, nav links like “Chat”, “Listings”, “Cart”)
+│   │   ├── Chat.tsx                      ← Chat component with message bubbles, input area, voice & camera icons (Task 2)
+│   │   ├── PhotoUpload.tsx               ← Seller photo upload & AI plant recognition UI (Task 3)
+│   │   ├── ListingWizard.tsx             ← Multi-step wizard for seller listing & preview (Task 4)
+│   │   └── FiltersPanel.tsx              ← Dynamic filters panel for product discovery (Task 7)
+│   │
+│   ├── email/                            ← Email template components (existing)
+│   ├── stripe/                           ← Stripe integration components (existing)
+│   ├── ui/                               ← Base UI components (buttons, inputs, etc.) – using shadcn/ui and Tailwind variables
+│   ├── user/                             ← User-related components (existing)
+│   ├── CheckoutButton.tsx                ← Stripe checkout functionality (existing)
+│   ├── Pricing.tsx                       ← Pricing section component (existing)
+│   ├── SessionProvider.tsx               ← Auth session provider (existing)
+│   ├── sign-in.tsx                       ← Sign in component (existing)
+│   └── sign-out.tsx                      ← Sign out component (existing)
+│
+├── lib/                                  ← Core libraries & configurations
+│   ├── hooks/                            ← Custom React hooks (existing)
+│   ├── auth.config.ts                    ← Authentication configuration (existing)
+│   ├── auth.ts                           ← Authentication utilities (existing)
+│   ├── authSendRequest.ts                ← Auth request handlers (existing)
+│   ├── mail.ts                           ← Email service configuration (existing)
+│   ├── utils.ts                          ← General utility functions (existing)
+│   └── ai.ts                             ← Utility for AI Image Recognition simulation (new for Task 3)
+│
+├── types/                                ← TypeScript type definitions
+│   ├── database.types.ts                 ← Database schema types (existing)
+│   └── next-auth.d.ts                    ← Next-Auth type extensions (existing)
+│
+├── utils/                                ← Utility functions and API clients
+│   ├── supabase/                         ← Supabase client & utilities (existing)
+│   │   ├── client.ts                     ← Supabase client configuration (existing)
+│   │   ├── front.ts                      ← Frontend Supabase utilities (existing)
+│   │   ├── server.ts                     ← Server-side Supabase utilities (existing)
+│   │   └── user.ts                       ← User-related Supabase utilities (existing)
+│   └── stripe.ts                         ← Stripe utility functions (existing)
+│
+├── supabase/                             ← Supabase configuration folder (existing)
+│   └── config.toml                       ← Supabase project configuration (existing)
+│
+├── public/                               ← Static assets (images, fonts, etc.) (existing)
+├── .env.local                            ← Local environment variables (existing)
+├── config.ts                             ← App configuration (existing)
+├── middleware.ts                         ← Next.js middleware for auth & routing (existing)
+└── [config files]                        ← Various configuration files (next.config.ts, tailwind.config.ts, etc.) (existing)
+
+----------------------------------------------------------------
+Notes:
+----------------------------------------------------------------
+• Pages under app/app/ represent authenticated parts of Planty (dashboard, chat, seller flows, etc.).  
+• Components under components/app have been added/updated to handle Planty’s UI elements (using shadcn/ui components and Tailwind’s built-in CSS variables such as bg-primary and text-primary-foreground).  
+• A new utility (lib/ai.ts) has been added to simulate AI-based image analysis for the seller’s photo upload (Task 3).  
+• Auth and Stripe payment integrations (and related server actions/API routes) remain untouched so that Planty still uses the proven starter template backend.  
+• The new listings page (app/app/listings/page.tsx) will leverage the FiltersPanel component for dynamic filtering (as described in Task 7).
+
+This minimal structure isolates each major feature in its own route and component while staying close to the original file placement guidelines. You can expand on each page/component as the implementation details for Planty evolve.

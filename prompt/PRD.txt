@@ -1,0 +1,121 @@
+# Project Overview
+
+Planty is an **AI-powered plant and flower marketplace** where users can **list their own plants for sale** while enjoying a **seamless, guided experience**. More than just a store, Planty acts like a **thoughtful florist**, helping users find, list, and explore plants in a natural, conversational way.
+
+Users can snap a **photo of a plant**, and Planty will **automatically fill in details like species, care needs, pricing suggestions, and best-selling tags**—making the listing process effortless.
+
+## **1️⃣ AI-Powered Plant Listings (For Sellers)**
+
+### 🏡 **Users Can Sell Their Own Plants**
+
+- **Simple, photo-based listing** → Upload an image, and AI will auto-fill details.
+- **Auto-categorization** → AI detects species, ideal care conditions, and pricing.
+- **Smart pricing suggestions** → AI compares similar listings to recommend a fair price.
+- **Condition & Care Notes** → Users get **AI-generated descriptions** to refine or edit.
+
+🔗 **Supabase Requirements**
+
+- **Table: `user_listings`** (user_id, product_name, image, description, price, status).
+- **Table: `ai_suggestions`** (species, care, pricing, tags).
+
+---
+
+## **2️⃣ AI-Assisted Data Entry (For Staff & Vendors)**
+
+### 📸 **Seamless Data Input for Vendors & Staff**
+
+- **Image-based product entry** → AI **auto-fills missing details** from uploaded images.
+- **Bulk upload support** → Vendors can **drag & drop multiple photos** to batch-list.
+- **Automated metadata completion** → AI fills in:
+    - 🌱 Species & Common Names
+    - 💧 Watering & Sunlight Needs
+    - 💲 Pricing suggestions
+    - 🏷️ Recommended tags for discoverability
+
+🔗 **Supabase Requirements**
+
+- **Table: `inventory`** (product_id, vendor_id, species, stock, price, tags).
+- **Table: `image_analysis`** (image_url, detected_species, confidence_score).
+
+---
+
+## **3️⃣ Conversational AI Shopping Experience**
+
+### 🌸 **Seamless & Personal Plant Discovery**
+
+- **Users chat with Planty AI** to find plants based on:
+    - 🌡️ Climate preferences
+    - 🏡 Home environment (Indoor/Outdoor)
+    - 🎁 Gift occasions & recommendations
+- **Instant responses** → AI surfaces the best matches in a **natural, flowing conversation**.
+- **Saved searches & past conversations** → AI **remembers user preferences** over time.
+
+🔗 **Supabase Requirements**
+
+- **Table: `chat_sessions`** (user_id, conversation_history, suggested_products).
+- **Table: `search_preferences`** (user_id, filters, past interactions).
+
+---
+
+## **4️⃣ Smart Cart & Personalized Engagement**
+
+### 🛒 **Frictionless Shopping with Adaptive Recommendations**
+
+- **Cart updates dynamically** as users browse and chat.
+- **One-click checkout** with saved payment & delivery info.
+- **Like & favorite plants** for later.
+- **Personalized email reminders** when prices drop or new matching plants are available.
+
+🔗 **Supabase Requirements**
+
+- **Table: `cart_items`** (user_id, product_id, quantity).
+- **Table: `favorites`** (user_id, product_id).
+- **Table: `notifications`** (user_id, type, triggered_by).
+
+---
+
+## **5️⃣ RBAC & User Roles (For Marketplace Operations)**
+
+### 👥 **Role-Based Access for Different Users**
+
+- **Admin** → Full access to platform management.
+- **Sellers** → Can list, edit, and manage their own products.
+- **Data Entry Staff** → Helps vendors input product details and improve listings.
+- **Operations & Finance** → Handles **payouts and financial insights**.
+- **Delivery Staff** → Assigned orders for shipping.
+
+🔗 **Supabase Requirements**
+
+- **Table: `users`** (role, email, name, created_at).
+- **Table: `roles_permissions`** (maps actions to roles).
+
+---
+
+## **6️⃣ Special Moments & Personalized Engagement**
+
+### 🎁 **Occasion-Based Plant Suggestions**
+
+- **Users save important dates** (birthdays, anniversaries) → Get timely AI-powered gift suggestions.
+- **AI learns buying habits** and recommends seasonal plants they might love.
+
+🔗 **Supabase Requirements**
+
+- **Table: `saved_dates`** (user_id, occasion, date).
+- **Table: `email_campaigns`** (personalized recommendations).
+
+---
+
+## **7️⃣ Mobile & Large Display Experiences**
+
+- **Mobile-first design** → Swipe-based browsing for easy exploration.
+- **Large screen mode** → Kiosk-style, looping plant showcase for physical store displays.
+
+---
+
+# **🛠️ Tech & Code Requirements**
+
+- **Next.js 14 (App Router) + Tailwind CSS.**
+- **Supabase for Auth, Database, and Real-Time Sync.**
+- **ShadCN UI for clean, seamless UI components.**
+- **AI-powered data completion for effortless listing creation.**
+- **Optimized for fluid, intuitive browsing.**
