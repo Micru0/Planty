@@ -10,7 +10,7 @@ import type { Tables } from '@/types/database.types'; // Import Tables
  * @throws If the session is invalid or the Supabase operation fails.
  */
 export async function saveProductToFavorites(
-  productId: string, // Changed from number to string
+  productId: string,
   session: Session | null
 ): Promise<void> {
   if (!session?.supabaseAccessToken) {
@@ -119,7 +119,7 @@ export async function fetchUserFavorites(
  * @throws If the session is invalid or the Supabase operation fails.
  */
 export async function removeProductFromFavorites(
-  favoriteId: string, // Changed from number to string
+  favoriteId: string,
   session: Session | null
 ): Promise<void> {
   if (!session?.supabaseAccessToken) {

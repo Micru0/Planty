@@ -50,7 +50,7 @@ export default function SavedItemsList() {
   const handleRemoveItem = async (favoriteId: number, itemName: string) => {
     if (!session) return;
     try {
-      await removeProductFromFavorites(favoriteId, session);
+      await removeProductFromFavorites(String(favoriteId), session);
       setSavedItems(prevItems => prevItems.filter(item => item.id !== favoriteId));
       toast({
         title: "Item Removed",

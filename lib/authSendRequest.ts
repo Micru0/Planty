@@ -29,7 +29,7 @@ export async function sendVerificationRequest(params: SendVerificationRequestPar
 			to,
 			subject: `Sign in to ${config.metadata.title}`,
 			html: html({ url, host, theme }),
-			text: text({ url, host }),
+			text: text({ url }),
 		}),
 	})
 
@@ -82,6 +82,6 @@ export function html({ url, host, theme }: { url: string; host: string; theme: T
 }
 
 // Email Text body (fallback for email clients that don't render HTML, e.g. feature phones)
-export function text({ url, host }: { url: string; host: string }) {
+export function text({ url }: { url: string }) {
 	return `Sign in to ${config.metadata.title}\n${url}\n\n`
 }
