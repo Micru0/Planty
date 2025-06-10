@@ -17,7 +17,6 @@ interface SendVerificationRequestParams {
 
 export async function sendVerificationRequest(params: SendVerificationRequestParams) {
 	const { identifier: to, provider, url, theme } = params
-	const { host } = new URL(url)
 	const res = await fetch("https://api.resend.com/emails", {
 		method: "POST",
 		headers: {
@@ -28,7 +27,7 @@ export async function sendVerificationRequest(params: SendVerificationRequestPar
 			from: provider.from,
 			to,
 			subject: `Sign in to ${config.metadata.title}`,
-			html: html({ url, host, theme }),
+			html: html({ url, host: new URL(url).host, theme }),
 			text: text({ url }),
 		}),
 	})

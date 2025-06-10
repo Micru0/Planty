@@ -20,7 +20,6 @@ export default function CartPage() {
     removeItem,
     updateItemQuantity,
     clearCart,
-    saveItemForLater,
     getTotalPrice,
     getItemCount,
     isCartLoaded, // Use this to manage loading state
@@ -28,31 +27,6 @@ export default function CartPage() {
 
   const { data: session } = useSession();
   const { toast } = useToast();
-
-  const handleSaveForLater = async (itemToSave: CartItem) => {
-    if (!session) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to save items for later.",
-        variant: "destructive",
-      });
-      return;
-    }
-    try {
-      await saveItemForLater(itemToSave, session);
-      toast({
-        title: "Saved for Later",
-        description: `${itemToSave.name} has been moved to your saved items.`,
-      });
-    } catch (error: any) {
-      console.error('[CartPage] Error saving item for later:', error);
-      toast({
-        title: "Error Saving Item",
-        description: error.message || "Could not save the item for later. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Display loading message until the cart is rehydrated from localStorage
   if (!isCartLoaded) {
@@ -132,9 +106,6 @@ export default function CartPage() {
               
               {/* Action Buttons */}
               <div className="md:col-span-1 flex items-center justify-end gap-1">
-                <Button variant="ghost" size="icon" onClick={() => handleSaveForLater(item)} className="text-muted-foreground hover:text-primary" aria-label="Save for later">
-                  <Heart className="h-5 w-5" />
-                </Button>
                 <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)} className="text-muted-foreground hover:text-destructive" aria-label="Remove item">
                   <Trash2 className="h-5 w-5" />
                 </Button>
