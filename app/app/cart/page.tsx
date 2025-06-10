@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react'; // useEffect might still be needed for other purposes, or can be removed if not.
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Image from 'next/image';
 import { Trash2, PlusCircle, MinusCircle, Heart } from 'lucide-react';
 import Link from 'next/link';

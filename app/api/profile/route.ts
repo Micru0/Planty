@@ -6,7 +6,7 @@ import config from '@/config';
 
 // Helper function to get plan name from price ID
 function getPlanNameFromPriceId(priceId: string): { name: string; interval: string } {
-	for (const [planType, planData] of Object.entries(config.stripe)) {
+	for (const [_planType, planData] of Object.entries(config.stripe)) {
 		if (planData.monthPriceId === priceId) {
 			return { name: planData.name, interval: 'month' };
 		}
@@ -40,7 +40,7 @@ export async function GET() {
 		}
 
 		// Get subscription data
-		const { data: subscriptionData, error: subscriptionError } = await supabase
+		const { data: subscriptionData } = await supabase
 			.from('stripe_customers')
 			.select('*')
 			.eq('user_id', userId)

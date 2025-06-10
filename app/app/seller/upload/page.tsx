@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 // New structure for an individual actionable task
 export interface ActionableTask {
@@ -52,7 +52,6 @@ export default function SellerUploadPage() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const router = useRouter();
 
   const handlePhotoAnalysisComplete = (results: AiResults, imageFile: File) => {
     console.log("SellerUploadPage: PhotoAnalysisComplete received", { results, imageFile });
@@ -123,7 +122,7 @@ export default function SellerUploadPage() {
         filePath = `public/${session.user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
         
         console.log(`Attempting to upload image to Supabase Storage at path: ${filePath}`);
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('listing-images')
           .upload(filePath, file, {
             cacheControl: '3600',
@@ -249,34 +248,41 @@ export default function SellerUploadPage() {
        {currentStep === 'publish' && (
         <div className="w-full max-w-lg p-6 bg-white rounded-lg shadow-md text-center">
           {isPublishing ? (
-            <>
-              <h2 className="text-xl font-semibold mb-4">Publishing...</h2>
-              <p>Submitting your listing for "{listingData.species || 'your plant'}" to the marketplace.</p>
-            </>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-lg">Publishing your listing...</p>
+            </div>
           ) : publishError ? (
-            <>
-              <h2 className="text-xl font-semibold mb-4 text-red-600">Publishing Failed</h2>
-              <p className="text-red-500 mb-4">{publishError}</p>
-              <Button onClick={handleGoBack} className="mr-2 force-outline-button">Back to Preview</Button>
-              <Button onClick={handleConfirmAndPublish} className="force-primary-button">Try Again</Button>
-            </>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-destructive font-semibold">Publishing Failed</p>
+              <p className="text-muted-foreground">{publishError}</p>
+              <Button onClick={handleGoBack} variant="outline">Back to Preview</Button>
+            </div>
           ) : (
-            <>
-              <h2 className="text-xl font-semibold mb-4 text-green-600">Listing Published Successfully!</h2>
-              <p>Your listing for "{listingData.species}" is now live.</p>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-2xl font-bold text-green-600">Congratulations!</p>
+              <p className="text-muted-foreground">Your listing has been successfully published.</p>
               {listingData.images && listingData.images[0] && (
-                <div className="my-2">
-                  <p className="text-sm">Image URL: <a href={listingData.images[0]} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">View Image</a></p>
-                  <img src={listingData.images[0]} alt={listingData.species || "Uploaded plant"} className="rounded-md max-h-40 w-auto mx-auto my-2" />
+                <div className="mt-4">
+                  <p className="font-semibold mb-2">Your new listing:</p>
+                  <Image 
+                    key={listingData.images[0]}
+                    src={listingData.images[0]} 
+                    alt="Published listing" 
+                    width={200}
+                    height={200}
+                    className="rounded-lg shadow-md" 
+                  />
                 </div>
               )}
-              <Button onClick={() => { 
-                setListingData({}); 
-                setCurrentStep('upload'); 
-                setPublishError(null); 
-                setIsPublishing(false); 
-              }} className="mt-6 force-primary-button">Create Another Listing</Button>
-            </>
+              <div className="flex gap-4 mt-6">
+                <Button asChild variant="secondary">
+                  <a href="/app/listings" target="_blank" rel="noopener noreferrer">View All Listings</a>
+                </Button>
+                <Button onClick={() => window.location.reload()}>
+                  Create Another Listing
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}

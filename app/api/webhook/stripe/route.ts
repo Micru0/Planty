@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/utils/stripe';
 import { createSupabaseAdminClient } from '@/utils/supabase/server';
 import Stripe from 'stripe';
-import { v4 as uuidv4 } from 'uuid'; // For generating care task IDs if needed, though DB will gen
+
 // This is where we receive Stripe webhook events
 // It used to update the user data, send emails, etc...
 // By default, it'll store the user in the database
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 									console.log(`Attempting to parse structured care details for listing ${listingId}.`);
 									const parsedDetails = JSON.parse(listingData.care_details);
 									
-									let allCareTips = parsedDetails.care_tips || [];
+									const allCareTips = parsedDetails.care_tips || [];
 									const essentialTasks: { title: string; description: string; frequency_days: number }[] = [];
 
 									// Separate essential from optional tasks
@@ -166,9 +166,9 @@ export async function POST(request: NextRequest) {
 										}
 									}
 
-								} catch (e) {
+								} catch (error) {
 									// Fallback for old data: care_details is a simple string.
-									console.warn(`Could not parse care_details as JSON for listing ${listingId}. Treating as plain text.`);
+									console.warn(`Could not parse care_details as JSON for listing ${listingId}. Treating as plain text. Error: ${error}`);
 									const actionableTasks = listingData.care_details.split('\n').filter(line => line.trim().length > 0);
 									let dayOffset = -1; 
 									for (const task of actionableTasks) {
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
 				}
 
 				case 'invoice.payment_succeeded': {
-					const invoice = event.data.object;
+					// const invoice = event.data.object;
 					console.log("invoice payment succeeded......");
 					// Extract plan and product info from the first line item
 					// const lineItem = invoice.lines.data[0];

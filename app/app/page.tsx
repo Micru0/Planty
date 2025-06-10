@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect } from 'react'; // For logging component mount
 
 /**
@@ -40,9 +41,11 @@ export default function AppPage() {
         
         {/* Image */}
         <div className="flex-1 flex justify-center items-center">
-          <img 
+          <Image 
             src="/images/plantybackground.png" 
             alt="Planty Infographic" 
+            width={500}
+            height={500}
             className="rounded-lg shadow-2xl w-full max-w-md"
           />
         </div>

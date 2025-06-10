@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent, FormEvent, DragEvent } from 'react';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,7 +75,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete, formId })
 
     try {
       // Simulate progress for UI feedback
-      let progressInterval = setInterval(() => {
+      const progressInterval = setInterval(() => {
         setProgress(prev => (prev >= 90 ? 90 : prev + 10));
       }, 500);
 
@@ -126,7 +127,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete, formId })
             <div className="space-y-1 text-center">
               {preview ? (
                 <>
-                  <img src={preview} alt="Plant preview" className="mx-auto h-40 w-auto rounded-md object-cover" />
+                  <Image src={preview} alt="Plant preview" width={160} height={160} className="mx-auto h-40 w-auto rounded-md object-cover" />
                   <div className="flex text-sm text-gray-600 dark:text-gray-400">
                     <label
                       htmlFor="file-upload"

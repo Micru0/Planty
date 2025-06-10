@@ -9,7 +9,6 @@ import type { Session } from 'next-auth';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,

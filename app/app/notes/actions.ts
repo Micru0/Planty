@@ -1,7 +1,6 @@
 'use server';
 
 import { getSupabaseClient } from '@/utils/supabase/server';
-import { stripe } from '@/utils/stripe';
 
 export async function addNote(title: string, content: string) {
   try {

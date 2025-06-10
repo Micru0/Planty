@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
 		const supabase = await getSupabaseClient();
 
-		const { data: subscriptionData, error: subscriptionError } = await supabase
+		const { data: subscriptionData } = await supabase
 			.from('stripe_customers')
 			.select('*')
 			.eq('user_id', userId)
