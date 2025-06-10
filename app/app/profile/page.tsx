@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import Loading from '@/components/app/profile/loading';
 import ProfileAndBillingContent from '@/components/app/profile/ProfileAndBillingContent';
-import SavedItemsList from '@/components/app/profile/SavedItemsList';
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -21,9 +20,6 @@ export default function ProfilePage() {
 				</Suspense>
 			</div>
 
-			<div>
-				<SavedItemsList />
-			</div>
 			<Toaster />
 		</div>
 	);
