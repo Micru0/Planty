@@ -5,6 +5,7 @@ import { createTransport } from "nodemailer"
 import { text } from "@/lib/authSendRequest"
 import { VerificationEmail } from "@/components/email/VerificationEmail"
 import { render } from '@react-email/render';
+import config from "@/config";
 
 
 // Extend the Session type to include supabaseAccessToken
@@ -35,8 +36,8 @@ const handler = NextAuth({
 				const result = await transport.sendMail({
 					to: email,
 					from: provider.from,
-					subject: `Login Link - ${host}`,
-					text: text({ url, host }),
+					subject: `Sign in to ${config.metadata.title}`,
+					text: text({ url }),
 					html: await render(VerificationEmail({ url, host })),
 				})
 

@@ -4,14 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import Image from 'next/image';
-import { Trash2, PlusCircle, MinusCircle, Heart } from 'lucide-react';
+import { Trash2, PlusCircle, MinusCircle } from 'lucide-react';
 import Link from 'next/link';
 import CheckoutButton from "@/components/CheckoutButton";
-import { useSession } from 'next-auth/react';
-import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useCartStore } from '@/store/cartStore'; // Import the Zustand store
-import type { CartItem } from '@/types/cart.types'; // Still needed for type hints if passing items around
 
 export default function CartPage() {
   // Get state and actions from Zustand store
@@ -24,9 +21,6 @@ export default function CartPage() {
     getItemCount,
     isCartLoaded, // Use this to manage loading state
   } = useCartStore();
-
-  const { data: session } = useSession();
-  const { toast } = useToast();
 
   // Display loading message until the cart is rehydrated from localStorage
   if (!isCartLoaded) {
