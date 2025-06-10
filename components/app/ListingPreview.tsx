@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ListingData } from "@/app/app/seller/upload/page";
 import { CheckCircle, Zap } from "lucide-react";
+import Image from "next/image";
 
 interface ListingPreviewProps {
   listingData: Partial<ListingData>;
@@ -37,11 +38,13 @@ export default function ListingPreview({ listingData, onEdit, onPublish }: Listi
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="w-full h-64 rounded-lg overflow-hidden border">
-            <img 
+        <div className="w-full h-64 rounded-lg overflow-hidden border relative">
+            <Image 
               src={imageUrl} 
               alt={species || "Plant image"} 
-              className="w-full h-full object-cover"
+              layout="fill"
+              objectFit="cover"
+              className="w-full h-full"
             />
         </div>
 

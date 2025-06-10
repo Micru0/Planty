@@ -26,7 +26,7 @@ export default function PortalButton() {
 			const supabase = await createSupabaseClient(session?.supabaseAccessToken);
 
 			if (user.id) {
-				const { data: customer, error: fetchError } = await supabase
+				const { data: customer } = await supabase
 					.from('stripe_customers')
 					.select('stripe_customer_id')
 					.eq('user_id', user.id)

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Home, Users, Settings, UserCircle, CreditCard, LayoutDashboard } from "lucide-react"
+import { Home, Users, UserCircle, CreditCard, LayoutDashboard } from "lucide-react"
 
 export function Sidebar() {
   return (

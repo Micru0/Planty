@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Filters } from '@/types';
 
 interface FiltersPanelProps {
-  // eslint-disable-next-line no-unused-vars
   onChange: (filters: Filters) => void;
   initialFilters?: Filters;
 }
@@ -31,7 +30,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ onChange, initialFilters = 
         console.log('[FiltersPanel] initialFilters prop changed, syncing internal state:', initialFilters);
         setFilters(initialFilters);
     }
-  }, [initialFilters]); // removed filters from dependency array to avoid potential loop with onChange
+  }, [initialFilters, filters]);
 
   const sizeMap: { [key: number]: string } = {
     1: 'Small',

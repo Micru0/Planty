@@ -28,7 +28,7 @@ const handler = NextAuth({
 				}
 			},
 			from: process.env.EMAIL_FROM,
-			sendVerificationRequest: async function ({ identifier: email, url, provider, theme }) {
+			sendVerificationRequest: async function ({ identifier: email, url, provider }) {
 				const { host } = new URL(url)
 				const transport = createTransport(provider.server)
 

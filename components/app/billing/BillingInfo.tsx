@@ -4,10 +4,11 @@ import PortalButton from '@/components/stripe/PortalButton';
 import { stripe } from '@/utils/stripe';
 import config from '@/config';
 import RefundButton from '@/components/stripe/RefundButton';
+import Image from 'next/image';
 
 // Helper function to get plan name from price ID
 function getPlanNameFromPriceId(priceId: string): { name: string; interval: string } {
-	for (const [planType, planData] of Object.entries(config.stripe)) {
+	for (const [_planType, planData] of Object.entries(config.stripe)) {
 		if (planData.monthPriceId === priceId) {
 			return { name: planData.name, interval: 'month' };
 		}
@@ -218,9 +219,11 @@ export async function BillingInfo() {
 				<div>
 					<h2 className="text-xl font-semibold mb-4">Profile Image</h2>
 					{userData.image ? (
-						<img
+						<Image
 							src={userData.image}
 							alt="User avatar"
+							width={80}
+							height={80}
 							className="w-20 h-20 rounded-full"
 						/>
 					) : (

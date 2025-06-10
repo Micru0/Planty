@@ -5,9 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Paperclip, Mic, SendHorizontal, Camera, CornerDownLeft, Loader2 } from 'lucide-react'; // Added Loader2
-import { useSession } from 'next-auth/react';
-import { useToast } from "@/hooks/use-toast";
+import { SendHorizontal, Loader2 } from 'lucide-react'; // Added Loader2
 
 interface Message {
   id: string;
@@ -19,8 +17,6 @@ interface Message {
 }
 
 const Chat = () => {
-  const { data: session } = useSession();
-  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoadingAiResponse, setIsLoadingAiResponse] = useState(false);

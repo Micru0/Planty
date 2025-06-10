@@ -38,8 +38,6 @@ export async function sendVerificationRequest(params: SendVerificationRequestPar
 }
 
 export function html({ url, host, theme }: { url: string; host: string; theme: Theme }) {
-	const escapedHost = host.replace(/\./g, "&#8203;.")
-
 	const brandColor = theme?.brandColor || "#346df1"
 	const color = {
 		background: "#f9f9f9",

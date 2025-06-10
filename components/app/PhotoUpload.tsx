@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, ChangeEvent, FormEvent, DragEvent } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Label } from '@/components/ui/label';
-import { Loader2, UploadCloud, Leaf } from 'lucide-react'; // For spinner and icons
+import { Loader2, UploadCloud } from 'lucide-react'; // For spinner and icons
 import type { AiResults } from '@/app/app/seller/upload/page'; // Import shared types
 import { cn } from "@/lib/utils";
 
