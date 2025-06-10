@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import type { CartItem } from '@/types/cart.types';
-import { saveProductToFavorites } from '@/utils/supabase/favorites';
 import type { Session } from 'next-auth';
 
 interface CartState {
@@ -11,7 +10,6 @@ interface CartState {
   removeItem: (itemId: string) => void;
   updateItemQuantity: (itemId: string, newQuantity: number) => void;
   clearCart: () => void;
-  saveItemForLater: (itemToSave: CartItem, session: Session | null) => Promise<void>; 
   getTotalPrice: () => number;
   getItemCount: () => number;
   isCartLoaded: boolean; // To track if cart has been loaded from localStorage
@@ -60,13 +58,6 @@ export const useCartStore = create<CartState>()(
       },
       clearCart: () => {
         set({ items: [] });
-      },
-      saveItemForLater: async (itemToSave, session) => {
-        if (!session || !session.user?.id) {
-          throw new Error('User session is invalid. Please log in to save items.');
-        }
-        await saveProductToFavorites(itemToSave.productId, session);
-        get().removeItem(itemToSave.id);
       },
       getTotalPrice: () => {
         return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
