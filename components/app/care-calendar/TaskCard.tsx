@@ -88,7 +88,7 @@ export function TaskCard({ task }: TaskCardProps) {
         <div className="flex items-center space-x-2">
             <Checkbox
                 id={`task-${optimisticTask.id}`}
-                checked={optimisticTask.completed}
+                checked={optimisticTask.completed ?? false}
                 onCheckedChange={(c) => handleCheckedChange(c as boolean)}
                 disabled={isPending}
                 aria-label={`Mark task as ${optimisticTask.completed ? 'incomplete' : 'complete'}`}

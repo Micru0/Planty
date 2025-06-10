@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import PortalButton from '@/components/stripe/PortalButton';
-import CheckoutButton from "@/components/CheckoutButton";
-import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 // Helper function to get plan badge style
@@ -31,36 +29,6 @@ function getPlanBadgeStyle(planName: string): { bgColor: string; textColor: stri
 			return {
 				bgColor: 'bg-gray-100',
 				textColor: 'text-gray-700',
-				borderColor: 'border-gray-200'
-			};
-	}
-}
-
-// Helper function to get interval badge style
-function getIntervalBadgeStyle(planName: string): { bgColor: string; textColor: string; borderColor: string } {
-	switch (planName.toLowerCase()) {
-		case 'free':
-			return {
-				bgColor: 'bg-gray-50',
-				textColor: 'text-gray-600',
-				borderColor: 'border-gray-200'
-			};
-		case 'basic':
-			return {
-				bgColor: 'bg-blue-50',
-				textColor: 'text-blue-600',
-				borderColor: 'border-blue-100'
-			};
-		case 'pro':
-			return {
-				bgColor: 'bg-purple-50',
-				textColor: 'text-purple-600',
-				borderColor: 'border-purple-100'
-			};
-		default:
-			return {
-				bgColor: 'bg-gray-50',
-				textColor: 'text-gray-600',
 				borderColor: 'border-gray-200'
 			};
 	}
@@ -120,12 +88,7 @@ export default function ProfileAndBillingContent() {
 
 	if (error) {
 		return (
-			<motion.div 
-				initial={{ opacity: 0, y: 10 }}
-				animate={{ opacity: 1, y: 0 }}
-				className="bg-red-50 border-l-4 border-red-500 p-5 rounded-lg shadow-md"
-				role="alert"
-			>
+			<div className="bg-red-50 border-l-4 border-red-500 p-5 rounded-lg shadow-md">
 				<div className="flex items-center">
 					<svg className="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -133,7 +96,7 @@ export default function ProfileAndBillingContent() {
 					<p className="font-medium text-red-800">Error</p>
 				</div>
 				<p className="mt-2 text-red-700">{error}</p>
-			</motion.div>
+			</div>
 		);
 	}
 
@@ -141,19 +104,15 @@ export default function ProfileAndBillingContent() {
 		return <div>No profile data available</div>;
 	}
 
-	const { userData, subscriptionData, planName, planInterval, priceData } = profileData;
+	const { userData, subscriptionData, planName, planInterval } = profileData;
 
 	return (
-		<motion.div 
+		<div 
 			className="space-y-10 pb-16 max-w-7xl mx-auto px-4 sm:px-6"
-			initial="hidden"
-			animate="visible"
-			variants={staggerContainer}
 		>
 			{/* User Information */}
-			<motion.div 
+			<div 
 				className="bg-[var(--background)] shadow-lg rounded-xl p-8 border border-[var(--border)] hover:shadow-xl transition-shadow duration-300"
-				variants={fadeIn}
 			>
 				<div className="flex items-center mb-6">
 					<div className="bg-gradient-to-r from-[#5059FE] to-[#7D65F6] p-2 rounded-lg mr-4">
@@ -193,12 +152,11 @@ export default function ProfileAndBillingContent() {
 						</div>
 					)}
 				</div>
-			</motion.div>
+			</div>
 
 			{/* Subscription Information */}
-			<motion.div 
+			<div 
 				className="bg-[var(--background)] shadow-lg rounded-xl p-8 border border-[var(--border)] hover:shadow-xl transition-shadow duration-300"
-				variants={fadeIn}
 			>
 				<div className="flex items-center mb-6">
 					<div className="bg-gradient-to-r from-[#5059FE] to-[#7D65F6] p-2 rounded-lg mr-4">
@@ -277,7 +235,7 @@ export default function ProfileAndBillingContent() {
 						</div>
 					)}
 				</div>
-			</motion.div>
-		</motion.div>
+			</div>
+		</div>
 	);
 } 
