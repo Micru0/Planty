@@ -10,18 +10,35 @@ import { createSupabaseClient } from "@/utils/supabase/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 
-export interface AiResults {
-  species: string;
-  careNeeds: string;
-  suggestedPrice: number;
-  confidence: number;
+// New structure for an individual actionable task
+export interface ActionableTask {
+  title: string;
+  description: string;
+  frequency_days: number;
+  is_optional: boolean;
 }
 
-export interface ListingData extends AiResults {
+// Data structure received from the Gemini Vision API
+export interface AiResults {
+  plantName: string;
+  actionable_tasks: ActionableTask[];
+  care_tips: string[];
+  tags: string[];
+  light_level: string;
+  size: string;
+  watering_frequency: string;
+}
+
+// Data structure for the entire listing flow
+export interface ListingData {
   imageFile: File | null;
-  images?: string[];
-  description?: string;
-  tags?: string[];
+  images?: string[]; // URLs after upload
+  species: string;
+  care_details: string; // Will hold the raw JSON string for submission
+  actionable_tasks?: ActionableTask[]; // Raw from AI
+  care_tips?: string[]; // Raw from AI
+  tags: string[];
+  price?: number;
   light_level?: string;
   size?: string;
   watering_frequency?: string;
@@ -37,11 +54,19 @@ export default function SellerUploadPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const handlePhotoAnalysisComplete = (results: AiResults, imageFile: File | null, _imageUrl: string | null) => {
+  const handlePhotoAnalysisComplete = (results: AiResults, imageFile: File) => {
     console.log("SellerUploadPage: PhotoAnalysisComplete received", { results, imageFile });
     setListingData(prevData => ({
       ...prevData,
-      ...results,
+      species: results.plantName,
+      // Store the raw tasks and tips
+      actionable_tasks: results.actionable_tasks,
+      care_tips: results.care_tips,
+      // Other fields from AI
+      tags: results.tags,
+      light_level: results.light_level,
+      size: results.size,
+      watering_frequency: results.watering_frequency,
       imageFile,
     }));
     setCurrentStep('edit');
@@ -78,8 +103,8 @@ export default function SellerUploadPage() {
       setCurrentStep('publish');
       return;
     }
-    if (!listingData.imageFile || !listingData.species || !listingData.suggestedPrice || !listingData.careNeeds) {
-        setPublishError("Missing required listing information (including image). Please go back and complete all fields.");
+    if (!listingData.imageFile || !listingData.species || !listingData.price || !listingData.care_details) {
+        setPublishError("Missing required listing information (image, species, price, care details). Please go back and complete all fields.");
         setIsPublishing(false);
         setCurrentStep('publish');
         return;
@@ -125,11 +150,23 @@ export default function SellerUploadPage() {
         console.warn("No image file found to upload, proceeding without image.");
       }
       
+      const rawAiJson = (listingData.actionable_tasks && listingData.care_tips) 
+        ? JSON.stringify({
+            plantName: listingData.species,
+            actionable_tasks: listingData.actionable_tasks,
+            care_tips: listingData.care_tips,
+            tags: listingData.tags,
+            light_level: listingData.light_level,
+            size: listingData.size,
+            watering_frequency: listingData.watering_frequency,
+          })
+        : listingData.care_details;
+
       const listingToInsert = {
         images: finalImageUrls,
         species: listingData.species!,
-        price: listingData.suggestedPrice!,
-        care_details: listingData.careNeeds!,
+        price: listingData.price!,
+        care_details: rawAiJson!,
         tags: listingData.tags || [],
         user_id: session.user.id,
         ...(listingData.light_level && { light_level: listingData.light_level }),
@@ -155,14 +192,11 @@ export default function SellerUploadPage() {
       }
       
       console.log("Listing published successfully to database! Inserted data:", insertData);
-      setListingData(prev => {
-        const newState: Partial<ListingData> = {
-          ...(prev as Partial<ListingData> & { images?: string[] }),
+      setListingData(prev => ({
+          ...prev,
           images: finalImageUrls, 
           imageFile: null 
-        };
-        return newState;
-      }); 
+      })); 
 
     } catch (err: any) {
       console.error("Publishing process error:", err);
@@ -196,7 +230,7 @@ export default function SellerUploadPage() {
       </div>
 
       {currentStep === 'upload' && (
-        <PhotoUpload onAnalysisComplete={handlePhotoAnalysisComplete} />
+        <PhotoUpload onAnalysisComplete={handlePhotoAnalysisComplete} formId="photo-upload-form" />
       )}
       {currentStep === 'edit' && (
         <ListingWizard 
@@ -223,7 +257,7 @@ export default function SellerUploadPage() {
             <>
               <h2 className="text-xl font-semibold mb-4 text-red-600">Publishing Failed</h2>
               <p className="text-red-500 mb-4">{publishError}</p>
-              <Button /*variant="outline"*/ onClick={handleGoBack} className="mr-2 force-outline-button">Back to Preview</Button>
+              <Button onClick={handleGoBack} className="mr-2 force-outline-button">Back to Preview</Button>
               <Button onClick={handleConfirmAndPublish} className="force-primary-button">Try Again</Button>
             </>
           ) : (
@@ -242,7 +276,6 @@ export default function SellerUploadPage() {
                 setPublishError(null); 
                 setIsPublishing(false); 
               }} className="mt-6 force-primary-button">Create Another Listing</Button>
-              <Button /*variant="outline"*/ onClick={() => router.push('/app/listings')} className="mt-6 ml-2 force-outline-button">Go to Listings</Button>
             </>
           )}
         </div>

@@ -702,3 +702,220 @@
         - Updated the data mapping logic to use `task.listing?.species` when setting the `plant_name` for display.
 - **Outcome**: Care tasks now load correctly on the Care Calendar page, displaying the appropriate plant species associated with each task.
 - **Files Modified**: `app/app/care-calendar/page.tsx`.
+
+---
+
+### Feature: Real AI Plant Recognition for Seller Flow
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Task File Reference**: `prompt/Seller Photo Upload & AI Plant Recognition Component.md`
+- **PRD Reference**: Section 1: "AI-Powered Plant Listings (For Sellers)" in `prompt/PRD.txt`
+- **Summary**:
+    - Replaced the simulated AI analysis in the seller listing flow with a direct integration to the Google Gemini Vision API.
+    - Created a new, dedicated API route (`app/api/vision/gemini/route.ts`) to handle image analysis.
+    - Engineered a system prompt to instruct the Gemini model to return a structured JSON object containing not only the plant's name, care instructions, and tags, but also inferred `light_level`, `size`, and `watering_frequency`.
+    - The entire seller flow was updated to use this new, richer data structure, from photo upload through to the final preview.
+    - This change automates more of the listing creation process for sellers, improving the user experience.
+- **Key Technologies/Libraries Used**:
+    - Next.js (API Routes)
+    - React (`useState`, `useEffect`)
+    - `@google/generative-ai` (Vision model)
+    - Shadcn/UI (`Textarea` - added)
+- **Files Created**:
+    1.  `app/api/vision/gemini/route.ts`
+- **Files Modified**:
+    1.  `app/app/seller/upload/page.tsx`: Updated `AiResults` and `ListingData` types and modified `handlePhotoAnalysisComplete` to map the new, expanded AI response to the listing state.
+    2.  `components/app/PhotoUpload.tsx`: Refactored to call the new `/api/vision/gemini` endpoint instead of simulating analysis.
+    3.  `components/app/ListingWizard.tsx`: Updated to display the new AI-suggested fields (`care_details`, `tags`) and added a `useEffect` hook to ensure the form's state correctly updates when new AI data is passed as props, fixing a bug where dropdowns were not defaulting to the suggested values.
+    4.  `components/app/ListingPreview.tsx`: Completely redesigned for a more elegant and comprehensive UI that correctly displays all fields from the new data structure.
+    5.  `components/ui/textarea.tsx` (created via CLI)
+- **Key Decisions & Configurations**:
+    - Created a separate API endpoint for vision tasks to keep it distinct from the text-based chat agent.
+    - Used the `responseMimeType: "application/json"` setting in the Gemini model config to enforce structured data output.
+    - Explicitly defined allowed string values for `light_level`, `size`, and `watering_frequency` in the prompt to ensure data consistency with form dropdowns.
+- **CLI Commands Used**:
+    - `npx shadcn@latest add textarea --yes`
+
+---
+
+### Feature: UI Revamp & Theming
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Summary**:
+    - Overhauled the application's visual theme for better consistency and appeal.
+    - Updated the main header to use the primary color scheme (`bg-primary`, `text-primary-foreground`) for stronger branding.
+    - Installed and configured the `@tailwindcss/typography` plugin to standardize text styles.
+    - Created custom `prose` styles in `app/globals.css` to ensure that all typography aligns with the application's color palette.
+    - Refined the layout on the main page (`app/app/page.tsx`) by removing redundant styling, making the CSS more maintainable.
+- **Key Technologies/Libraries Used**:
+    - Tailwind CSS (`@tailwindcss/typography`)
+- **Files Modified**:
+    1. `components/app/Header.tsx`: Updated to use primary theme colors.
+    2. `app/app/page.tsx`: Applied `prose` classes and removed manual typography styling.
+    3. `app/globals.css`: Added custom styles for the `prose` class to align with theme variables.
+    4. `tailwind.config.ts`: Added the `@tailwindcss/typography` plugin.
+    5. `package.json`, `pnpm-lock.yaml`: Added `@tailwindcss/typography` dependency.
+- **CLI Commands Used**:
+    - `npm i --save-dev @tailwindcss/typography` (later managed by `pnpm install`)
+
+---
+
+### Feature: Seller-Specific "My Listings" Page
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **PRD Reference**: Addresses the need for a "Seller Dashboard / Listing Management" area from `prompt/remaining_tasks.md`.
+- **Summary**:
+    - Implemented a new page at `/app/profile/my-listings` for sellers to view all the listings they have created.
+    - The page securely fetches listing data from the Supabase `listing` table, filtered by the authenticated user's ID.
+    - This feature reuses the existing server-side Supabase client utility (`utils/supabase/server.ts`) for secure and consistent data access.
+    - A "My Listings" button was added to the main profile page (`/app/profile`) for easy navigation.
+- **Key Technologies/Libraries Used**:
+    - Next.js (App Router)
+    - React (Server Components)
+    - Supabase (`@supabase/ssr` for server-side client)
+- **Files Created**:
+    1. `app/app/profile/my-listings/page.tsx`
+- **Files Modified**:
+    1. `app/app/profile/page.tsx`: Added a `Button` linking to the new "My Listings" page.
+- **Key Decisions & Configurations**:
+    - Created a dedicated route under the user's profile for managing their own listings.
+    - Leveraged the existing `getSupabaseClient` function to ensure consistency with the project's authentication and data fetching patterns.
+
+---
+
+### Fix: Development Environment & Package Management
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Issue**:
+    - Persistent terminal warnings regarding a `prettier` version mismatch.
+    - A runtime error (`Error: Module ... was instantiated ... but the module factory is not available`) after making changes.
+- **Summary & Fix**:
+    - **Package Manager Correction**: Identified that the project is configured for `pnpm` (due to `pnpm-lock.yaml` and `pnpm` overrides in `package.json`) but was being run with `npm`. The user was instructed to switch to `pnpm`. This resolved the `prettier` warnings.
+    - **Cache Invalidation**: The runtime error was caused by a stale Next.js cache after switching package managers. The `.next` directory was deleted to force a clean rebuild of the application.
+- **Outcome**: The development environment is now stable. Terminal warnings related to package version conflicts are resolved, and the application runs without caching errors.
+- **Key Actions**:
+    - Removed `node_modules` and `package-lock.json`.
+    - Ran `pnpm install` to correctly install dependencies.
+    - Ran `rm -rf .next` to clear the Next.js cache.
+- **Guidance**: Use `pnpm run dev` to start the development server going forward.
+
+### Fix: `care_task` Creation Failure During Local Development
+- **Date**: 2024-08-04 (Assumed date, please adjust if necessary)
+- **Issue**: The `care_task` table was not being populated after a successful Stripe checkout, even though the checkout flow itself was completing and the cart was being cleared correctly.
+- **Investigation Summary**:
+    - The issue began after implementing the real-time Gemini Vision API for seller listings.
+    - Initial investigation focused on data mismatches between the AI-generated `care_details` and the data expected by the webhook. This led to correcting the data flow from the Vision API (`careInstructions` -> `care_details`) and ensuring the `CartItem` was created correctly on the product detail page.
+    - Despite these fixes, the problem persisted. The core issue was that the `care_task` insertion was failing silently.
+    - Verbose logging was added to the Stripe webhook handler (`app/api/webhook/stripe/route.ts`) to trace the execution flow.
+- **Root Cause & Resolution**:
+    - The enhanced logs revealed that the webhook endpoint was **never being called** in the local development environment.
+    - The root cause was a failure to run the Stripe CLI webhook forwarder (`stripe listen --forward-to ...`). This is a required step for local development, as documented in the first entry of this devlog, but it was overlooked.
+    - **Fix**: The user was reminded to run the `stripe listen` command in a separate terminal and update the `.env.local` file with the temporary webhook secret provided by the command. Once this was done, webhook events were correctly forwarded, and the `care_task` creation logic executed successfully.
+- **Key Takeaway**: For features relying on webhooks, always ensure the local forwarding mechanism (like the Stripe CLI) is active during development and testing. Silent failures often point to a breakdown in the event delivery chain itself.
+
+### Feature: UI Revamp & Theming
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Summary**:
+    - Overhauled the application's visual theme for better consistency and appeal.
+    - Updated the main header to use the primary color scheme (`bg-primary`, `text-primary-foreground`) for stronger branding.
+    - Installed and configured the `@tailwindcss/typography` plugin to standardize text styles.
+    - Created custom `prose` styles in `app/globals.css` to ensure that all typography aligns with the application's color palette.
+    - Refined the layout on the main page (`app/app/page.tsx`) by removing redundant styling, making the CSS more maintainable.
+- **Key Technologies/Libraries Used**:
+    - Tailwind CSS (`@tailwindcss/typography`)
+- **Files Modified**:
+    1. `components/app/Header.tsx`: Updated to use primary theme colors.
+    2. `app/app/page.tsx`: Applied `prose` classes and removed manual typography styling.
+    3. `app/globals.css`: Added custom styles for the `prose` class to align with theme variables.
+    4. `tailwind.config.ts`: Added the `@tailwindcss/typography` plugin.
+    5. `package.json`, `pnpm-lock.yaml`: Added `@tailwindcss/typography` dependency.
+- **CLI Commands Used**:
+    - `npm i --save-dev @tailwindcss/typography` (later managed by `pnpm install`)
+
+### Feature: Care Calendar UX Revamp (Strategy & Initial Fix)
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Issue**: User provided critical feedback on the Care Calendar (`/app/care-calendar`):
+    1.  **Cluttered UI**: Displaying all tasks for all plants, regardless of due date, created a cluttered and overwhelming view, especially for users with multiple plants.
+    2.  **Lack of Prioritization**: General advice (e.g., "Avoid direct sunlight") was treated as a task, mixing informational tips with actionable duties.
+    3.  **Non-functional "Mark as Complete"**: The checkbox was not working, giving the impression the feature was unfinished.
+- **Investigation & Immediate Fix**:
+    - Terminal logs revealed the root cause of the broken checkbox: `Could not find the 'completed_at' column of 'care_task'`. The server action `updateTaskCompletion` was attempting to write to a non-existent column.
+    - **Fix**: The schema was updated by running `ALTER TABLE public.care_task ADD COLUMN completed_at TIMESTAMPTZ;`. This change was documented in `prompt/0-supabase-sql.md`. This immediately restored the "Mark as Complete" functionality.
+- **New Strategic Plan for Care Calendar**:
+    - Based on user feedback, a new two-phase plan was approved to overhaul the feature.
+    - **Phase 1: Smarter Data Model**:
+        - **Goal**: Differentiate between actionable tasks and general tips at the source (AI).
+        - **Action 1**: Update the Gemini Vision API prompt (`/api/vision/gemini`) to return a JSON object that separates `actionable_tasks` (e.g., watering schedules) from general `care_tips`.
+        - **Action 2**: Add a `care_tips` column (type `text[]`) to the `listing` table in the database to store this general advice.
+        - **Action 3**: Modify the Stripe webhook (`/api/webhook/stripe`) to correctly populate both the `care_task` table with actionable items and the `listing.care_tips` field with the general advice upon purchase.
+    - **Phase 2: Mobile-First UI Redesign**:
+        - **Goal**: Create a clean, mobile-friendly dashboard focused on immediate actions.
+        - **Action 1**: Redesign the main calendar page (`/app/care-calendar`) to be a "Today's Care" dashboard, showing only plants that require action *today* or are overdue.
+        - **Action 2**: Create a new dynamic route (`/app/care-calendar/[listingId]`) as a "Plant Action View". Tapping a plant on the dashboard will lead here, showing a large primary action button (e.g., "Water Plant"), the list of general `care_tips`, and upcoming tasks for that specific plant.
+- **Outcome**: The critical bug is resolved, and a clear, user-centric vision is in place to transform the Care Calendar into a highly intuitive and valuable feature.
+
+---
+
+### Feature: Complete Care Calendar Revamp
+- **Date**: (Placeholder for actual date - YYYY-MM-DD)
+- **Summary**: Executed the two-phase strategic plan to completely overhaul the Care Calendar feature, transforming it from a simple, cluttered checklist into an intelligent, action-oriented, and mobile-friendly dashboard.
+- **Phase 1: Smarter Data Model (Implementation)**:
+    - **AI Prompt Evolution**: The Gemini Vision API prompt (`app/api/vision/gemini/route.ts`) was updated to produce a structured JSON response that separates `actionable_tasks` from general `care_tips`.
+    - **Database Schema Update**:
+        - Added the `completed_at` column to `care_task` to fix the "Mark as Complete" functionality.
+        - Added the `care_tips` column (`text[]`) to the `listing` table to store non-actionable advice.
+    - **Webhook Logic Refinement**: The Stripe webhook (`app/api/webhook/stripe/route.ts`) was enhanced to intelligently parse the new structured JSON from `care_details`. It now correctly populates the `care_task` table with actionable items and saves the general `care_tips` to the corresponding `listing`. It includes a graceful fallback for older listings with plain text details.
+- **Phase 2: Mobile-First UI Redesign (Implementation)**:
+    - **"Today's Care" Dashboard**: Overhauled `app/app/care-calendar/page.tsx` into a dashboard that displays only plants with overdue tasks or tasks due today. The old list was replaced with a grid of new `PlantCareCard` components, providing a clean, at-a-glance view of urgent needs.
+    - **"Plant Action" View**: Created a new dynamic route `app/app/care-calendar/[listingId]/page.tsx` to serve as a focused action hub for a single plant. This page features:
+        - A prominent hero image of the plant.
+        - A "Primary Action" card highlighting the most urgent task.
+        - A "Care Tips" card displaying general advice.
+        - A full list of all tasks for the plant, with checkboxes to mark them as complete.
+    - **Optimistic UI**: Implemented `useOptimistic` and `useTransition` hooks on the Plant Action page for instant UI feedback when a user marks a task as complete, enhancing the user experience.
+- **Key Files Created/Modified**:
+    - `prompt/0-supabase-sql.md`: Updated with `completed_at` and `care_tips` column additions.
+    - `app/api/webhook/stripe/route.ts`: Implemented new webhook logic.
+    - `types/care-calendar.types.ts`: Updated to match the new, more flexible database schema (e.g., nullable fields).
+    - `components/app/care-calendar/PlantCareCard.tsx`: (New) Compact card for the dashboard.
+    - `app/app/care-calendar/page.tsx`: (Overhauled) The "Today's Care" dashboard.
+    - `app/app/care-calendar/[listingId]/page.tsx`: (New) The "Plant Action" view.
+    - `app/actions/care-tasks.ts`: The server action used by the new action page to update tasks.
+- **Outcome**: The Care Calendar is now a highly intuitive and valuable feature. It prioritizes information for the user, separates actionable tasks from general advice, and provides a clean, modern, and responsive interface for managing plant care.
+
+---
+
+### Feature: Care Calendar Simplification & UX Overhaul
+- **Date**: 2024-08-05
+- **PRD Reference**: Based on direct user feedback for a simpler, more engaging experience.
+- **Summary**:
+    - Based on user feedback that the Care Calendar was too verbose and treated all information as strict tasks, the entire feature was overhauled. The goal was to make the feature more intuitive, fun, and intelligent. This involved a significant refactor of the data model, AI prompts, backend logic, and UI.
+- **Key Changes & Rationale**:
+    1.  **Smarter AI Prompts**: 
+        - The system prompt for the Gemini Vision API (`app/api/vision/gemini/route.ts`) was re-engineered.
+        - The AI is now instructed to return a more structured object for `actionable_tasks`, where each task includes:
+            - `title`: A short, fun, kid-friendly title (e.g., "Time for a drink!").
+            - `description`: The detailed instructions.
+            - `frequency_days`: An integer for intelligent scheduling.
+            - `is_optional`: A boolean to differentiate essential chores from optional suggestions (like fertilizing).
+    2.  **Database Schema Update**:
+        - The `care_task` table was altered to support the new data model.
+        - Added `title` (TEXT) and `is_optional` (BOOLEAN) columns.
+        - **Bug Fix**: The initial test failed because these columns were missing from the production schema. The user successfully applied an `ALTER TABLE` script to resolve the `Could not find the 'is_optional' column` error. This migration is now documented in `0-supabase-sql.md`.
+    3.  **Backend Logic (Stripe Webhook)**:
+        - The `checkout.session.completed` handler in `app/api/webhook/stripe/route.ts` was completely rewritten.
+        - It now parses the rich JSON from a listing's `care_details`.
+        - It intelligently separates tasks: non-optional tasks are used to create `care_task` entries, while optional tasks are appended to the listing's `care_tips` array.
+        - Task scheduling is now dynamic, using the `frequency_days` from the AI instead of a fixed 7-day interval.
+    4.  **UI Simplification**:
+        - The "Plant Action" page (`app/app/care-calendar/[listingId]/page.tsx`) was updated to display the new, simple `task.title` instead of the long `task.description`, making the interface much cleaner.
+        - The `CareTask` type in `types/care-calendar.types.ts` was updated to include the `title`.
+    5.  **Build & Data Flow Fixes**:
+        - **Build Error**: Fixed a build-time error in `app/api/vision/gemini/route.ts` caused by unescaped backticks inside the `systemPrompt` template literal.
+        - **Data Integrity**: Modified `app/app/seller/upload/page.tsx` to ensure the full, raw JSON from the AI is saved to the `care_details` field during listing creation, making it available to the webhook. The cosmetic issue of this raw JSON appearing on the listing detail page was noted and will be addressed separately.
+- **Outcome**: The Care Calendar is now significantly more aligned with the user's vision. It provides a simple, fun, and prioritized view of plant care, powered by more intelligent data from the ground up.
+- **Files Modified**:
+    - `prompt/0-supabase-sql.md`
+    - `prompt/devlog.txt`
+    - `app/api/vision/gemini/route.ts`
+    - `app/api/webhook/stripe/route.ts`
+    - `app/app/seller/upload/page.tsx`
+    - `components/app/ListingWizard.tsx`
+    - `types/care-calendar.types.ts`
+    - `app/app/care-calendar/[listingId]/page.tsx`

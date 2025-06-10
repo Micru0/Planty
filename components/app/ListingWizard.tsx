@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ListingData } from '@/app/app/seller/upload/page'; // Import shared types
+import { Textarea } from '@/components/ui/textarea'; // Import Textarea
+
+// Duplicating this interface as a workaround for module resolution issues.
+interface ActionableTask {
+  title: string;
+  description: string;
+  frequency_days: number;
+  is_optional: boolean;
+}
 
 interface ListingWizardProps {
   initialData: Partial<ListingData>;
@@ -17,11 +26,38 @@ interface ListingWizardProps {
 export default function ListingWizard({ initialData, onSave, onBack }: ListingWizardProps) {
   const [formData, setFormData] = useState<Partial<ListingData>>(initialData);
 
+  useEffect(() => {
+    // When initialData changes (i.e., new AI results arrive), update the form.
+    let combinedCareDetails = '';
+    if (initialData.actionable_tasks || initialData.care_tips) {
+      const tasksHeader = 'Actionable Tasks:';
+      const tipsHeader = '\nGeneral Care Tips:';
+      
+      const tasks = (initialData.actionable_tasks as ActionableTask[] | undefined)?.map(task => `- ${task.title}: ${task.description}`).join('\n') || '';
+      const tips = initialData.care_tips?.map(tip => `- ${tip}`).join('\n') || '';
+
+      combinedCareDetails = `${tasksHeader}\n${tasks}\n${tipsHeader}\n${tips}`;
+    }
+
+    setFormData({
+      ...initialData,
+      care_details: initialData.care_details || combinedCareDetails,
+    });
+  }, [initialData]);
+
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData(prevData => ({
       ...prevData,
-      [name]: name === 'suggestedPrice' || name === 'confidence' ? parseFloat(value) : value,
+      [name]: name === 'price' ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleTagsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setFormData(prevData => ({
+      ...prevData,
+      tags: value.split(',').map(tag => tag.trim()),
     }));
   };
 
@@ -56,29 +92,42 @@ export default function ListingWizard({ initialData, onSave, onBack }: ListingWi
             />
           </div>
           <div>
-            <Label htmlFor="careNeeds">Care Needs</Label>
-            {/* Using Input for now, can be changed to Textarea if needed */}
-            <Input 
-              id="careNeeds" 
-              name="careNeeds" 
-              value={formData.careNeeds || ''} 
-              onChange={handleChange} 
+            <Label htmlFor="care_details">Care Details</Label>
+            <Textarea
+              id="care_details" 
+              name="care_details" 
+              value={formData.care_details || ''} 
+              onChange={handleChange}
+              rows={4}
+              placeholder="e.g., Loves bright, indirect light. Water when top 2 inches of soil are dry."
             />
           </div>
           <div>
-            <Label htmlFor="suggestedPrice">Price ($)</Label>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input
+              id="tags"
+              name="tags"
+              value={formData.tags?.join(', ') || ''}
+              onChange={handleTagsChange}
+              placeholder="e.g., low-light, pet-friendly, air-purifying"
+            />
+          </div>
+          <div>
+            <Label htmlFor="price">Price ($)</Label>
             <Input 
-              id="suggestedPrice" 
-              name="suggestedPrice" 
+              id="price" 
+              name="price" 
               type="number" 
               step="0.01" 
-              value={formData.suggestedPrice || 0} 
-              onChange={handleChange} 
+              value={formData.price || ''} 
+              onChange={handleChange}
+              placeholder="e.g., 25.99"
+              required
             />
           </div>
           <div>
             <Label htmlFor="light_level">Light Level</Label>
-            <Select name="light_level" value={formData.light_level || ""} onValueChange={handleSelectChange('light_level')}>
+            <Select name="light_level" value={formData.light_level} onValueChange={handleSelectChange('light_level')}>
               <SelectTrigger id="light_level">
                 <SelectValue placeholder="Select light level" />
               </SelectTrigger>
@@ -91,7 +140,7 @@ export default function ListingWizard({ initialData, onSave, onBack }: ListingWi
           </div>
           <div>
             <Label htmlFor="size">Size</Label>
-            <Select name="size" value={formData.size || ""} onValueChange={handleSelectChange('size')}>
+            <Select name="size" value={formData.size} onValueChange={handleSelectChange('size')}>
               <SelectTrigger id="size">
                 <SelectValue placeholder="Select plant size" />
               </SelectTrigger>
@@ -104,7 +153,7 @@ export default function ListingWizard({ initialData, onSave, onBack }: ListingWi
           </div>
           <div>
             <Label htmlFor="watering_frequency">Watering Frequency</Label>
-            <Select name="watering_frequency" value={formData.watering_frequency || ""} onValueChange={handleSelectChange('watering_frequency')}>
+            <Select name="watering_frequency" value={formData.watering_frequency} onValueChange={handleSelectChange('watering_frequency')}>
               <SelectTrigger id="watering_frequency">
                 <SelectValue placeholder="Select watering frequency" />
               </SelectTrigger>

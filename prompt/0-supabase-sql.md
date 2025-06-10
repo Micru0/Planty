@@ -14,6 +14,7 @@ create table public.listing (
   species text not null,
   price numeric(10,2) not null,
   care_details text not null,
+  care_tips text[] null,
   tags text[],
   light_level text null, -- Describes the light requirement for the plant, e.g., Low, Medium, High.
   size text null, -- Describes the general size of the plant, e.g., 1 (Small), 2 (Medium), 3 (Large).
@@ -59,12 +60,24 @@ CREATE TABLE care_task (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES next_auth.users(id) NOT NULL,
     listing_id UUID REFERENCES listing(id) NOT NULL,
+    title TEXT, -- A short, fun title for the task (e.g., "Time for a drink!")
     task_description TEXT NOT NULL,
     due_date TIMESTAMPTZ NOT NULL,
     completed BOOLEAN DEFAULT FALSE,
+    is_optional BOOLEAN NOT NULL DEFAULT FALSE, -- To distinguish between essential tasks and optional suggestions
+    completed_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Note (YYYY-MM-DD): The 'completed_at' column was added manually via the SQL below to fix a bug.
+-- ALTER TABLE public.care_task ADD COLUMN completed_at TIMESTAMPTZ;
+
+-- Note (2024-08-05): The 'title' and 'is_optional' columns were added to support a more user-friendly
+-- and intelligent care calendar experience. This was done via the following ALTER statement after initial table creation.
+-- ALTER TABLE public.care_task
+-- ADD COLUMN title TEXT,
+-- ADD COLUMN is_optional BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Optional: Add an index for faster querying by user_id and due_date
 CREATE INDEX idx_care_task_user_due_date ON care_task(user_id, due_date);

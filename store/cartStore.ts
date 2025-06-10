@@ -7,14 +7,10 @@ import type { Session } from 'next-auth';
 
 interface CartState {
   items: CartItem[];
-  // eslint-disable-next-line no-unused-vars
-  addItem: (product: Omit<CartItem, 'id' | 'quantity'>, quantity?: number) => void;
-  // eslint-disable-next-line no-unused-vars
+  addItem: (product: Omit<CartItem, 'id' | 'quantity'>, quantity: number) => void;
   removeItem: (itemId: string) => void;
-  // eslint-disable-next-line no-unused-vars
   updateItemQuantity: (itemId: string, newQuantity: number) => void;
   clearCart: () => void;
-  // eslint-disable-next-line no-unused-vars
   saveItemForLater: (itemToSave: CartItem, session: Session | null) => Promise<void>; 
   getTotalPrice: () => number;
   getItemCount: () => number;
@@ -30,7 +26,7 @@ export const useCartStore = create<CartState>()(
       items: [],
       isCartLoaded: false,
       setIsCartLoaded: (loaded) => set({ isCartLoaded: loaded }),
-      addItem: (product, quantity = 1) => {
+      addItem: (product, quantity) => {
         set((state) => {
           const existingItem = state.items.find(item => item.productId === product.productId);
           if (existingItem) {

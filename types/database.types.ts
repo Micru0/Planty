@@ -12,6 +12,7 @@ export type Database = {
       care_task: {
         Row: {
           completed: boolean | null
+          completed_at: string | null
           created_at: string | null
           due_date: string
           id: string
@@ -22,6 +23,7 @@ export type Database = {
         }
         Insert: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           due_date: string
           id?: string
@@ -32,6 +34,7 @@ export type Database = {
         }
         Update: {
           completed?: boolean | null
+          completed_at?: string | null
           created_at?: string | null
           due_date?: string
           id?: string
@@ -138,6 +141,7 @@ export type Database = {
       listing: {
         Row: {
           care_details: string
+          care_tips: string[] | null
           created_at: string
           id: string
           images: string[]
@@ -152,6 +156,7 @@ export type Database = {
         }
         Insert: {
           care_details: string
+          care_tips?: string[] | null
           created_at?: string
           id?: string
           images: string[]
@@ -166,6 +171,7 @@ export type Database = {
         }
         Update: {
           care_details?: string
+          care_tips?: string[] | null
           created_at?: string
           id?: string
           images?: string[]
@@ -278,7 +284,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      requesting_app_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

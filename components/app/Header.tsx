@@ -40,11 +40,11 @@ export function Header() {
   };
 
   return (
-    <header className="bg-background text-foreground shadow-sm py-4 px-4 border-b border-border">
+    <header className="bg-primary text-primary-foreground shadow-sm py-4 px-4 border-b border-border">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/app/" onClick={() => handleNavClick("App Home")}>
-            <h1 className="text-xl font-semibold text-foreground">Planty</h1>
+            <h1 className="text-xl font-semibold text-primary-foreground">Planty</h1>
           </Link>
         </div>
 
@@ -56,7 +56,7 @@ export function Header() {
                 key={item.label}
                 variant="ghost"
                 asChild
-                className="text-foreground/80 hover:text-foreground hover:bg-muted/50 px-3 py-2 flex items-center space-x-2"
+                className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 px-3 py-2 flex items-center space-x-2"
                 onClick={() => handleNavClick(item.label)}
               >
                 <Link href={item.href}>
@@ -73,7 +73,7 @@ export function Header() {
             variant="ghost"
             size="icon"
             asChild
-            className="text-foreground/80 hover:text-foreground hover:bg-muted/50"
+            className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
           >
             <Link href="/app/profile/favorites">
               <Heart size={20} />
@@ -83,7 +83,7 @@ export function Header() {
             variant="ghost"
             size="icon"
             asChild
-            className="text-foreground/80 hover:text-foreground hover:bg-muted/50 relative"
+            className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 relative"
           >
             <Link href="/app/cart">
               <ShoppingCart size={20} />
@@ -96,7 +96,7 @@ export function Header() {
           </Button>
           <UserMenu />
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-all duration-200"
+            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
             aria-label="Open menu"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -106,7 +106,7 @@ export function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden mt-4 py-2 border-t border-border bg-background">
+        <div className="md:hidden mt-4 py-2 border-t border-border bg-primary">
           <nav className="flex flex-col space-y-1 px-2">
             {navItems.map((item) => {
               const IconComponent = item.icon;
@@ -115,7 +115,7 @@ export function Header() {
                   key={item.label}
                   variant="ghost"
                   asChild
-                  className="text-foreground/80 hover:text-foreground hover:bg-muted/50 justify-start px-3 py-2 flex items-center space-x-2"
+                  className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 justify-start px-3 py-2 flex items-center space-x-2"
                   onClick={() => handleNavClick(item.label)}
                 >
                   <Link href={item.href}>

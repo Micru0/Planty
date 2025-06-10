@@ -104,13 +104,13 @@ export default function ListingDetailPage() {
 
   const handleAddToCart = () => {
     if (product) {
-      const cartProductToAdd = {
+      const cartItem: Omit<import('@/types/cart.types').CartItem, 'id' | 'quantity'> = {
         productId: product.id,
         name: product.species,
         price: product.price,
         imageUrl: product.images && product.images.length > 0 ? product.images[0] : undefined,
       };
-      addItemToCartStore(cartProductToAdd, 1);
+      addItemToCartStore(cartItem, 1);
       toast({
         title: "Added to Cart!",
         description: `${product.species} has been added to your cart.`,

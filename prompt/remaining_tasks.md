@@ -25,9 +25,6 @@ This document outlines the remaining tasks and areas for enhancement in the Plan
 - **Global Spacing & Layout**: Ensure consistent spacing, alignment, and responsive layouts across all pages.
 
 ## 4. Seller Feature Enhancements
-- **Real AI Plant Recognition**:
-    - Integrate a live AI service for plant image recognition during the seller's listing creation process (`components/app/PhotoUpload.tsx`).
-    - Replace the current simulated AI analysis with actual species detection, care need suggestions, etc. (Refer to `prompt/Seller Photo Upload & AI Plant Recognition Component.md`).
 - **Seller Dashboard / Listing Management**:
     - Develop a dedicated interface for sellers to view, manage (edit, mark as sold, delist), and track the performance of their active listings.
 
@@ -38,7 +35,10 @@ This document outlines the remaining tasks and areas for enhancement in the Plan
     - At a suitable future point, conduct a thorough review of `prompt/0-supabase-sql.md` against the live Supabase database schema to ensure they are perfectly synchronized.
     - Document any discrepancies and update the markdown file.
 
-## 6. Longer-Term PRD Features (Post-MVP / Future Scope)
+## 6. Bugs & Regressions
+- **`care_task` creation failure**: After implementing the real AI analysis for the seller flow, `care_task` entries are reportedly no longer being created in the Supabase table upon successful Stripe checkout. This needs to be investigated.
+
+## 7. Longer-Term PRD Features (Post-MVP / Future Scope)
 - **Admin Dashboard**: For site administrators to manage users, listings, content, and view analytics.
 - **Content Management System (CMS)**:
     - Implement features for creating and managing blog posts, plant care guides, or other informational content.
