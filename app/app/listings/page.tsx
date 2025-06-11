@@ -64,18 +64,12 @@ const ListingsPage: React.FC = () => {
 
   const fetchProductsAndPreferences = useCallback(async () => {
     console.log('fetchProductsAndPreferences. Session status:', sessionStatus);
-    if (sessionStatus !== 'authenticated' || !session?.supabaseAccessToken) {
-      console.log('Session not authenticated or no Supabase access token for fetching products/prefs.');
-      if (sessionStatus === 'unauthenticated') setError("Please log in to view listings.");
-      setIsLoading(false);
-      return;
-    }
     setIsLoading(true);
     setError(null);
 
     try {
       console.log('Attempting to fetch products from Supabase...');
-      const supabase = createSupabaseClient(session.supabaseAccessToken);
+      const supabase = createSupabaseClient(session?.supabaseAccessToken);
       const { data: productData, error: fetchError } = await supabase.from('listing').select('*');
 
       if (fetchError) {
@@ -102,13 +96,15 @@ const ListingsPage: React.FC = () => {
         setAllProducts(processedProducts);
 
         if (!initialFiltersLoaded) {
-          console.log('Fetching user preferences...');
-          const userPrefs = await fetchUserPreferences(session);
-          console.log('Fetched user preferences:', userPrefs);
-          setTimeout(() => {
-            console.log('[ListingsPage] Deferred update: setting currentFilters from userPrefs.');
-            setCurrentFilters(userPrefs);
-          }, 0);
+          if (session) {
+            console.log('Fetching user preferences...');
+            const userPrefs = await fetchUserPreferences(session);
+            console.log('Fetched user preferences:', userPrefs);
+            setTimeout(() => {
+              console.log('[ListingsPage] Deferred update: setting currentFilters from userPrefs.');
+              setCurrentFilters(userPrefs);
+            }, 0);
+          }
           setInitialFiltersLoaded(true);
         }
       } else {
@@ -170,9 +166,6 @@ const ListingsPage: React.FC = () => {
 
   if (error) {
     return <div className="p-4 text-center text-red-500">Error: {error}</div>;
-  }
-   if (sessionStatus === 'unauthenticated') {
-    return <div className="p-4 text-center text-orange-500">Please log in to browse our plants!</div>;
   }
 
   return (

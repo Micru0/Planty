@@ -58,12 +58,7 @@ export default function ListingDetailPage() {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!listingId || !session?.supabaseAccessToken) {
-        if (!session?.supabaseAccessToken && session) {
-            // Avoid setting error if session is present but token is momentarily unavailable during auth flow
-        } else if (!session) {
-            setError("Session not available. Please log in.");
-        }
+      if (!listingId) {
         setIsLoading(false);
         return;
       }
@@ -71,7 +66,7 @@ export default function ListingDetailPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const supabase = createSupabaseClient(session.supabaseAccessToken);
+        const supabase = createSupabaseClient(session?.supabaseAccessToken);
         const { data, error: fetchError } = await supabase
           .from('listing')
           .select('*')
@@ -97,12 +92,14 @@ export default function ListingDetailPage() {
       setIsLoading(false);
     };
 
-    if (session !== undefined) { // Ensure session loading is complete
-        fetchProduct();
-    }
-  }, [listingId, session]);
+    fetchProduct();
+  }, [listingId, session?.supabaseAccessToken]);
 
   const handleAddToCart = () => {
+    if (!session) {
+      router.push('/api/auth/signin');
+      return;
+    }
     if (product) {
       const cartItem: Omit<import('@/types/cart.types').CartItem, 'id' | 'quantity'> = {
         productId: product.id,

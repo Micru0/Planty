@@ -146,10 +146,11 @@ COMMENT ON FUNCTION requesting_app_user_id IS 'Retrieves the user ID (from next_
 -- RLS Policies for listing table
 ALTER TABLE public.listing ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Select listing policy" ON public.listing;
-CREATE POLICY "Authenticated users can view all listings"
+DROP POLICY IF EXISTS "Authenticated users can view all listings" ON public.listing; 
+CREATE POLICY "Public can view all listings"
 ON public.listing
 FOR SELECT
-USING (auth.role() = 'authenticated');
+USING (true);
 
 DROP POLICY IF EXISTS "Insert listing policy" ON public.listing;
 CREATE POLICY "Insert listing policy" ON public.listing AS PERMISSIVE FOR INSERT WITH CHECK (requesting_app_user_id() = user_id);

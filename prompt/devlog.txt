@@ -919,3 +919,29 @@
     - `components/app/ListingWizard.tsx`
     - `types/care-calendar.types.ts`
     - `app/app/care-calendar/[listingId]/page.tsx`
+
+---
+
+### Initial Vercel Deployment & Build Stabilization
+- **Date**: 2024-08-05
+- **Summary**:
+    - Performed the initial deployment of the Planty application to Vercel.
+    - The process involved systematically resolving a series of build-time errors that only surfaced in the Vercel CI environment, which treats warnings as critical errors.
+- **Key Fixes & Resolutions**:
+    1.  **Strict Linting**: Addressed numerous TypeScript and ESLint errors across the codebase, including unused variables, unused imports, and `prefer-const` violations which are non-critical locally but failed the Vercel build.
+    2.  **Removal of Template Remnants**:
+        - Deleted `components/Pricing.tsx` and its usage in `app/page.tsx`, as it was incompatible with the app's one-time payment model.
+        - The root page (`/`) was updated to redirect to the main application view at `/app/listings`.
+    3.  **Removal of Incomplete Features**:
+        - The "Saved for Later" (Favorites) feature was causing persistent and complex type errors due to a mismatch between frontend data types and Supabase schema expectations.
+        - To stabilize the build, the feature was completely removed. This involved deleting:
+            - `components/app/profile/SavedItemsList.tsx`
+            - `utils/supabase/favorites.ts`
+        - All related code was subsequently removed from the Profile page (`/app/profile/page.tsx`) and the Zustand cart store (`/store/cartStore.ts`).
+    4.  **Type Safety & Consistency**:
+        - Resolved a type error in `components/app/care-calendar/TaskCard.tsx` where a `null` value was being passed to a component expecting a `boolean`.
+        - Fixed multiple instances where function signatures were changed in one file but the corresponding calls were not updated in other files (e.g., `lib/auth.ts` and `lib/authSendRequest.ts`).
+    5.  **Environment Variables**:
+        - The final build failures were due to missing environment variables in the Vercel project settings (`Neither apiKey nor config.authenticator provided`, `supabaseUrl is required`).
+        - **Resolution**: All required environment variables from the local `.env` file (for Stripe, Supabase, NextAuth, and Nodemailer) were added to the Vercel project's Environment Variables settings.
+- **Outcome**: The application is now successfully deployed and running on Vercel. The codebase is significantly cleaner, with legacy template code and incomplete features removed, and stricter type and linting standards enforced.
