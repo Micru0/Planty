@@ -987,3 +987,21 @@
         - It now includes the standard `Header` and `Footer` components.
         - Added a call-to-action button that directs users from the landing page (`macrokw.com`) to the full application (`planty.macrokw.com/app/listings`).
 - **Outcome**: The application's domain structure is now more conventional. `macrokw.com` acts as the public-facing landing page, and `planty.macrokw.com` hosts the interactive user application. This provides a clearer separation of concerns for users.
+
+---
+
+### Final: Decouple Root Domain
+- **Date**: 2024-08-06
+- **Summary**:
+    - Based on final user confirmation, the root domain (`macrokw.com`) has been completely decoupled from the Planty application.
+    - The application now lives exclusively on the `planty.macrokw.com` subdomain.
+- **Files Modified**:
+    1. `middleware.ts`: Reverted to its original state, containing only auth protection logic for app routes. All hostname-aware routing was removed.
+- **Files Deleted**:
+    1. `app/planty/page.tsx`: The dedicated landing page, no longer needed.
+    2. `components/app/Footer.tsx`: The footer for the landing page, no longer needed.
+- **Infrastructure Steps**:
+    - The user was instructed to perform the final infrastructure changes:
+        - **In Vercel**: Remove `macrokw.com` and `www.macrokw.com` from the project's domain list.
+        - **In Squarespace (DNS Provider)**: Delete the `A` and `CNAME` records that point `macrokw.com` and `www.macrokw.com` to Vercel.
+- **Outcome**: The Planty application is now cleanly isolated to its subdomain. The root domain `macrokw.com` is free to be used for any other purpose and has no connection to this project.
