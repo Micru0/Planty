@@ -1011,8 +1011,9 @@
 ### Security: Temporarily Disable Magic Link
 - **Date**: 2024-08-06
 - **Summary**:
-    - In response to a bot-driven spam attack sending large volumes of emails, the magic link (email-based) login provider was temporarily disabled.
+    - In response to a bot-driven spam attack sending large volumes of emails, all magic link and email-based login providers were disabled.
     - This is a security measure to immediately halt the abuse of the email sending service.
 - **Files Modified**:
-    1. `lib/auth.config.ts`: The `Resend` provider configuration was commented out from the `providers` array in the NextAuth.js settings.
+    1. `lib/auth.config.ts`: The `Resend` provider configuration was initially commented out, but the root issue was in `lib/auth.ts`.
+    2. `lib/auth.ts`: The file was modified to remove the hardcoded `Nodemailer` provider. The `providers` array was removed entirely from this file, ensuring it correctly inherits its provider list (which now only contains Google) from `lib/auth.config.ts`. This is the definitive fix.
 - **Outcome**: The only available login method is now Google OAuth. This stops the spam email issue at its source. The magic link can be re-enabled after further security measures (like CAPTCHA) are implemented.

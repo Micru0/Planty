@@ -1,11 +1,11 @@
 import NextAuth from "next-auth"
 import authConfig from "@/lib/auth.config"
-import Nodemailer from "next-auth/providers/nodemailer"
-import { createTransport } from "nodemailer"
-import { text } from "@/lib/authSendRequest"
-import { VerificationEmail } from "@/components/email/VerificationEmail"
-import { render } from '@react-email/render';
-import config from "@/config";
+// import Nodemailer from "next-auth/providers/nodemailer"
+// import { createTransport } from "nodemailer"
+// import { text } from "@/lib/authSendRequest"
+// import { VerificationEmail } from "@/components/email/VerificationEmail"
+// import { render } from '@react-email/render';
+// import config from "@/config";
 
 
 // Extend the Session type to include supabaseAccessToken
@@ -17,37 +17,7 @@ declare module 'next-auth' {
 
 const handler = NextAuth({
 	...authConfig,
-	providers: [
-		...authConfig.providers,
-		Nodemailer({
-			server: {
-				host: process.env.EMAIL_SERVER_HOST,
-				port: Number(process.env.EMAIL_SERVER_PORT),
-				auth: {
-					user: process.env.EMAIL_SERVER_USER,
-					pass: process.env.EMAIL_SERVER_PASSWORD
-				}
-			},
-			from: process.env.EMAIL_FROM,
-			sendVerificationRequest: async function ({ identifier: email, url, provider }) {
-				const { host } = new URL(url)
-				const transport = createTransport(provider.server)
-
-				const result = await transport.sendMail({
-					to: email,
-					from: provider.from,
-					subject: `Sign in to ${config.metadata.title}`,
-					text: text({ url }),
-					html: await render(VerificationEmail({ url, host })),
-				})
-
-				const failed = result.rejected.concat(result.pending).filter(Boolean)
-				if (failed.length) {
-					throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
-				}
-			}
-		}),
-	],
+	// The providers are inherited from auth.config.ts now
 })
 
 export const { auth, signIn, signOut } = handler
