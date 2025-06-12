@@ -14,6 +14,7 @@ const authConfig = {
 			clientId: process.env.AUTH_GOOGLE_ID!,
 			clientSecret: process.env.AUTH_GOOGLE_SECRET!,
 		}),
+		/*
 		...(config.emailProvider === "resend" ? [
 			Resend({
 				apiKey: process.env.AUTH_RESEND_KEY,
@@ -24,6 +25,7 @@ const authConfig = {
 				}
 			})
 		] : []),
+		*/
 	],
 	adapter: SupabaseAdapter({
 		url: process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -1006,3 +1006,13 @@
         - **In Squarespace (DNS Provider)**: Delete the `A` and `CNAME` records that point `macrokw.com` and `www.macrokw.com` to Vercel.
         - **In Google Cloud Console**: Updated OAuth credentials. The Authorized JavaScript origin was changed to `https://planty.macrokw.com`, and the Authorized redirect URI was changed to `https://planty.macrokw.com/api/auth/callback/google`. The old `macrokw.com` and `www.macrokw.com` URIs were removed.
 - **Outcome**: The Planty application is now cleanly isolated to its subdomain. The root domain `macrokw.com` is free to be used for any other purpose and has no connection to this project. All authentication flows are correctly configured for the new subdomain.
+---
+
+### Security: Temporarily Disable Magic Link
+- **Date**: 2024-08-06
+- **Summary**:
+    - In response to a bot-driven spam attack sending large volumes of emails, the magic link (email-based) login provider was temporarily disabled.
+    - This is a security measure to immediately halt the abuse of the email sending service.
+- **Files Modified**:
+    1. `lib/auth.config.ts`: The `Resend` provider configuration was commented out from the `providers` array in the NextAuth.js settings.
+- **Outcome**: The only available login method is now Google OAuth. This stops the spam email issue at its source. The magic link can be re-enabled after further security measures (like CAPTCHA) are implemented.
