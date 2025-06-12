@@ -1004,4 +1004,5 @@
     - The user was instructed to perform the final infrastructure changes:
         - **In Vercel**: Remove `macrokw.com` and `www.macrokw.com` from the project's domain list.
         - **In Squarespace (DNS Provider)**: Delete the `A` and `CNAME` records that point `macrokw.com` and `www.macrokw.com` to Vercel.
-- **Outcome**: The Planty application is now cleanly isolated to its subdomain. The root domain `macrokw.com` is free to be used for any other purpose and has no connection to this project.
+        - **In Google Cloud Console**: Updated OAuth credentials. The Authorized JavaScript origin was changed to `https://planty.macrokw.com`, and the Authorized redirect URI was changed to `https://planty.macrokw.com/api/auth/callback/google`. The old `macrokw.com` and `www.macrokw.com` URIs were removed.
+- **Outcome**: The Planty application is now cleanly isolated to its subdomain. The root domain `macrokw.com` is free to be used for any other purpose and has no connection to this project. All authentication flows are correctly configured for the new subdomain.
