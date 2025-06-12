@@ -14,18 +14,6 @@ const authConfig = {
 			clientId: process.env.AUTH_GOOGLE_ID!,
 			clientSecret: process.env.AUTH_GOOGLE_SECRET!,
 		}),
-		/*
-		...(config.emailProvider === "resend" ? [
-			Resend({
-				apiKey: process.env.AUTH_RESEND_KEY,
-				from: process.env.EMAIL_FROM,
-				sendVerificationRequest: async function ({ identifier: email, url, provider, theme }) {
-					//@ts-ignore - Ignoring type check here as sendVerificationRequest expects slightly different parameter structure than what Next-Auth provides
-					sendVerificationRequest({ identifier: email, url, provider, theme })
-				}
-			})
-		] : []),
-		*/
 	],
 	adapter: SupabaseAdapter({
 		url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
