@@ -945,3 +945,25 @@
         - The final build failures were due to missing environment variables in the Vercel project settings (`Neither apiKey nor config.authenticator provided`, `supabaseUrl is required`).
         - **Resolution**: All required environment variables from the local `.env` file (for Stripe, Supabase, NextAuth, and Nodemailer) were added to the Vercel project's Environment Variables settings.
 - **Outcome**: The application is now successfully deployed and running on Vercel. The codebase is significantly cleaner, with legacy template code and incomplete features removed, and stricter type and linting standards enforced.
+
+---
+
+### Feature: Subdomain Routing for `planty.macrokw.com`
+- **Date**: 2024-08-06
+- **Summary**:
+    - Implemented support for the `planty.macrokw.com` subdomain to display a dedicated page.
+    - This allows for separate content to be served based on the hostname, preparing for distinct application experiences.
+- **Key Technologies/Libraries Used**:
+    - Next.js (Middleware)
+- **Files Created**:
+    1. `app/planty/page.tsx`: A new landing page specifically for the `planty` subdomain.
+- **Files Modified**:
+    1. `middleware.ts`:
+        - Updated to inspect the request's `host` header.
+        - If the host starts with "planty.", the request is rewritten to the internal `/planty` path, effectively serving the content from `app/planty/page.tsx` on the subdomain.
+        - The matcher was updated to be more generic (`/((?!api|_next/static|_next/image|favicon.ico).*)`) to process all relevant requests.
+        - Existing authentication logic for protected paths was preserved and refactored to run after the subdomain check.
+- **Key Decisions & Configurations**:
+    - Used Next.js middleware to handle URL rewriting based on the hostname, which is an efficient and scalable way to manage subdomains within a single Next.js application.
+    - Instructed user on DNS configuration: An `A` record for the `planty` host pointing to Vercel's IP address (`76.76.21.21`) is required at the domain registrar (Squarespace).
+- **Outcome**: The application is now configured to serve a unique page on the `planty.macrokw.com` subdomain. This requires both the code changes to be deployed via Vercel and the corresponding DNS record to be correctly configured and propagated.

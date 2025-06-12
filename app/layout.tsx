@@ -7,6 +7,7 @@ import { SessionProvider } from "next-auth/react"
 import { Toaster } from 'react-hot-toast';
 import FooterWrapper from "@/components/ui/FooterWrapper";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
+import { ReactPlugin } from "@stagewise-plugins/react";
 
 export const metadata: Metadata = config.metadata;
 
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const stagewiseConfig = {
-    plugins: []
+    plugins: [ReactPlugin],
   };
 
   return (
@@ -25,7 +26,7 @@ export default function RootLayout({
         <body
           className="antialiased min-h-screen flex flex-col"
         >
-          {process.env.NODE_ENV === 'development' && <StagewiseToolbar config={stagewiseConfig} />}
+          <StagewiseToolbar config={stagewiseConfig} />
           <Toaster position="top-center" />
           <main className="flex-grow">
             {children}

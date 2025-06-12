@@ -126,9 +126,12 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@stagewise-plugins/react':
+        specifier: ^0.4.7
+        version: 0.4.7(@stagewise/toolbar@0.4.7)
       '@stagewise/toolbar-next':
-        specifier: ^0.4.4
-        version: 0.4.4(@types/react@19.1.6)(next@15.1.7(@babel/core@7.24.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        specifier: ^0.4.7
+        version: 0.4.7(@types/react@19.1.6)(next@15.1.7(@babel/core@7.24.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@tailwindcss/typography':
         specifier: ^0.5.16
         version: 0.5.16(tailwindcss@3.4.17)
@@ -1319,21 +1322,26 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
-  '@stagewise/toolbar-next@0.4.4':
-    resolution: {integrity: sha512-picfZefzoKLXbipCsWwPsE/P9p6JDAGoVpB4YUqXoRG290a5wLTswBjLZNN0kJ8vs11LYFoZgtqOlQW8EfuwRA==}
+  '@stagewise-plugins/react@0.4.7':
+    resolution: {integrity: sha512-o3pa/2Tc/Lo+e7OEEDx45vx2NczPgDyGYQHfCZzN0IHLVDm/mj5uSmi5Ldo2NjJdThK4hSQNA5MLc4zBhkUlNg==}
+    peerDependencies:
+      '@stagewise/toolbar': 0.4.7
+
+  '@stagewise/toolbar-next@0.4.7':
+    resolution: {integrity: sha512-U7uDlTYqIPVlGtukFJMDsUU68jni0nGuxGrXA+VXU74Udt22OtGmFuOr42KdEELXb2vDvZ4igc1XjwRH/4NnkQ==}
     peerDependencies:
       '@types/react': '>=18.0.0'
       next: '>=14.0.0'
       react: '>=18.0.0'
 
-  '@stagewise/toolbar-react@0.4.4':
-    resolution: {integrity: sha512-IRihvvQZ+dsoXge+fJWHp4S+4k9Vt5/1U+ryOUwy8Fsrxe4pASnLWm3fj1V9RZ4wrPzNKbDEISlEZtl8yk3+FA==}
+  '@stagewise/toolbar-react@0.4.7':
+    resolution: {integrity: sha512-of7J8uJiqq38VVxKMxO4dkshb6wOc32xx4epi+ODovMLOrN8Xv2KbYMUxEtoPEKGkZagIwEZWiXKhI8ra29NVw==}
     peerDependencies:
       '@types/react': '>=18.0.0'
       react: '>=18.0.0'
 
-  '@stagewise/toolbar@0.4.4':
-    resolution: {integrity: sha512-hVxGqeYFx780m9SIv+YqhHx4o/fq94pMwr8OoemOCyOKozCGkvSIjpqkONvUyY5yWR+AVcop2p79LsSTdA6Etw==}
+  '@stagewise/toolbar@0.4.7':
+    resolution: {integrity: sha512-xU+lDPiGEhFs6Vx5Xwy1y43VQJIul9muN5u0eXnMoFKJYL+ku931at3gTRVP/+4BEgAC4G8P5g3pACyYa0ikOA==}
 
   '@stripe/stripe-js@5.10.0':
     resolution: {integrity: sha512-PTigkxMdMUP6B5ISS7jMqJAKhgrhZwjprDqR1eATtFfh0OpKVNp110xiH+goeVdrJ29/4LeZJR4FaHHWstsu0A==}
@@ -4431,20 +4439,24 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@stagewise/toolbar-next@0.4.4(@types/react@19.1.6)(next@15.1.7(@babel/core@7.24.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@stagewise-plugins/react@0.4.7(@stagewise/toolbar@0.4.7)':
     dependencies:
-      '@stagewise/toolbar-react': 0.4.4(@types/react@19.1.6)(react@19.1.0)
+      '@stagewise/toolbar': 0.4.7
+
+  '@stagewise/toolbar-next@0.4.7(@types/react@19.1.6)(next@15.1.7(@babel/core@7.24.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@stagewise/toolbar-react': 0.4.7(@types/react@19.1.6)(react@19.1.0)
       '@types/react': 19.1.6
       next: 15.1.7(@babel/core@7.24.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
 
-  '@stagewise/toolbar-react@0.4.4(@types/react@19.1.6)(react@19.1.0)':
+  '@stagewise/toolbar-react@0.4.7(@types/react@19.1.6)(react@19.1.0)':
     dependencies:
-      '@stagewise/toolbar': 0.4.4
+      '@stagewise/toolbar': 0.4.7
       '@types/react': 19.1.6
       react: 19.1.0
 
-  '@stagewise/toolbar@0.4.4': {}
+  '@stagewise/toolbar@0.4.7': {}
 
   '@stripe/stripe-js@5.10.0': {}
 

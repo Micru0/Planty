@@ -52,7 +52,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@stagewise/toolbar-next": "^0.4.4",
+    "@stagewise-plugins/react": "^0.4.7",
+    "@stagewise/toolbar-next": "^0.4.7",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
