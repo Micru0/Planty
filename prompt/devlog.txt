@@ -967,3 +967,23 @@
     - Used Next.js middleware to handle URL rewriting based on the hostname, which is an efficient and scalable way to manage subdomains within a single Next.js application.
     - Instructed user on DNS configuration: An `A` record for the `planty` host pointing to Vercel's IP address (`76.76.21.21`) is required at the domain registrar (Squarespace).
 - **Outcome**: The application is now configured to serve a unique page on the `planty.macrokw.com` subdomain. This requires both the code changes to be deployed via Vercel and the corresponding DNS record to be correctly configured and propagated.
+---
+
+### Refactor: Swap Main App and Landing Page Domains
+- **Date**: 2024-08-06
+- **Summary**:
+    - Based on user feedback, the domain strategy was reversed. The full application is now served from `planty.macrokw.com`, while the root domain (`macrokw.com`) serves a dedicated landing page.
+- **Key Technologies/Libraries Used**:
+    - Next.js (Middleware)
+- **Files Created**:
+    1. `components/app/Footer.tsx`: A simple, reusable footer component for UI consistency.
+- **Files Modified**:
+    1. `middleware.ts`:
+        - The logic was inverted. It now detects if the request is for the *main* domain (e.g., `macrokw.com`).
+        - If it is the main domain, the request is rewritten to show the content from `/planty`, effectively making it the landing page.
+        - Requests to the `planty.` subdomain or Vercel preview URLs are passed through to the main application, where authentication checks are applied as before.
+    2. `app/planty/page.tsx`:
+        - Overhauled from a simple text page into a proper landing page.
+        - It now includes the standard `Header` and `Footer` components.
+        - Added a call-to-action button that directs users from the landing page (`macrokw.com`) to the full application (`planty.macrokw.com/app/listings`).
+- **Outcome**: The application's domain structure is now more conventional. `macrokw.com` acts as the public-facing landing page, and `planty.macrokw.com` hosts the interactive user application. This provides a clearer separation of concerns for users.
